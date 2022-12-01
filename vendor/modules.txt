@@ -1,0 +1,77 @@
+# github.com/Masterminds/semver/v3 v3.1.1
+## explicit; go 1.12
+github.com/Masterminds/semver/v3
+# github.com/cloudflare/cloudflare-go v0.55.0
+## explicit; go 1.17
+github.com/cloudflare/cloudflare-go
+# github.com/go-logr/logr v1.2.3
+## explicit; go 1.16
+github.com/go-logr/logr
+# github.com/google/go-querystring v1.1.0
+## explicit; go 1.10
+github.com/google/go-querystring/query
+# github.com/hashicorp/go-cleanhttp v0.5.2
+## explicit; go 1.13
+github.com/hashicorp/go-cleanhttp
+# github.com/hashicorp/go-retryablehttp v0.7.1
+## explicit; go 1.13
+github.com/hashicorp/go-retryablehttp
+# github.com/inconshreveable/mousetrap v1.0.1
+## explicit; go 1.18
+github.com/inconshreveable/mousetrap
+# github.com/pkg/errors v0.9.1
+## explicit
+github.com/pkg/errors
+# github.com/spf13/cobra v1.6.1
+## explicit; go 1.15
+github.com/spf13/cobra
+# github.com/spf13/pflag v1.0.5
+## explicit; go 1.12
+github.com/spf13/pflag
+# go.uber.org/automaxprocs v1.5.1
+## explicit; go 1.18
+go.uber.org/automaxprocs
+go.uber.org/automaxprocs/internal/cgroups
+go.uber.org/automaxprocs/internal/runtime
+go.uber.org/automaxprocs/maxprocs
+# golang.org/x/net v0.0.0-20220722155237-a158d28d115b
+## explicit; go 1.17
+golang.org/x/net/idna
+# golang.org/x/text v0.3.7
+## explicit; go 1.17
+golang.org/x/text/secure/bidirule
+golang.org/x/text/transform
+golang.org/x/text/unicode/bidi
+golang.org/x/text/unicode/norm
+# golang.org/x/time v0.0.0-20220224211638-0e9765cccd65
+## explicit
+golang.org/x/time/rate
+# gomodules.xyz/clock v0.0.0-20200817085942-06523dba733f
+## explicit; go 1.14
+gomodules.xyz/clock
+# gomodules.xyz/flags v0.1.3
+## explicit; go 1.16
+gomodules.xyz/flags
+# gomodules.xyz/logs v0.0.6
+## explicit; go 1.16
+gomodules.xyz/logs
+# gomodules.xyz/sets v0.2.1
+## explicit; go 1.14
+gomodules.xyz/sets
+# gomodules.xyz/signals v0.2.0
+## explicit; go 1.15
+gomodules.xyz/signals
+# gomodules.xyz/wait v0.2.0
+## explicit; go 1.14
+gomodules.xyz/wait
+# gomodules.xyz/x v0.0.14
+## explicit; go 1.17
+gomodules.xyz/x/version
+# k8s.io/klog/v2 v2.80.1
+## explicit; go 1.13
+k8s.io/klog/v2
+k8s.io/klog/v2/internal/buffer
+k8s.io/klog/v2/internal/clock
+k8s.io/klog/v2/internal/dbg
+k8s.io/klog/v2/internal/serialize
+k8s.io/klog/v2/internal/severity
