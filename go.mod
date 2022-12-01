@@ -1,0 +1,31 @@
+module go.bytebuilders.dev/cloudflare-dns-proxy
+
+go 1.18
+
+require (
+	github.com/cloudflare/cloudflare-go v0.55.0
+	github.com/pkg/errors v0.9.1
+	github.com/spf13/cobra v1.6.1
+	go.uber.org/automaxprocs v1.5.1
+	gomodules.xyz/logs v0.0.6
+	gomodules.xyz/signals v0.2.0
+	gomodules.xyz/x v0.0.14
+	k8s.io/klog/v2 v2.80.1
+)
+
+require (
+	github.com/Masterminds/semver/v3 v3.1.1 // indirect
+	github.com/go-logr/logr v1.2.3 // indirect
+	github.com/google/go-querystring v1.1.0 // indirect
+	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
+	github.com/hashicorp/go-retryablehttp v0.7.1 // indirect
+	github.com/inconshreveable/mousetrap v1.0.1 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
+	golang.org/x/net v0.0.0-20220722155237-a158d28d115b // indirect
+	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/time v0.0.0-20220224211638-0e9765cccd65 // indirect
+	gomodules.xyz/clock v0.0.0-20200817085942-06523dba733f // indirect
+	gomodules.xyz/flags v0.1.3 // indirect
+	gomodules.xyz/sets v0.2.1 // indirect
+	gomodules.xyz/wait v0.2.0 // indirect
+)
