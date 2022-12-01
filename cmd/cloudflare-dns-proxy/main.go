@@ -21,6 +21,7 @@ import (
 	"runtime"
 
 	"go.bytebuilders.dev/cloudflare-dns-proxy/pkg/cmds"
+
 	_ "go.uber.org/automaxprocs"
 	"gomodules.xyz/logs"
 	"k8s.io/klog/v2"

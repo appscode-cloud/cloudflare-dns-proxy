@@ -25,14 +25,38 @@ import (
 	"os"
 
 	"github.com/cloudflare/cloudflare-go"
-	"github.com/pkg/errors"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
 	v "gomodules.xyz/x/version"
 	"k8s.io/klog/v2"
 )
 
+var (
+	version = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "version",
+		Help: "Version information about this binary",
+		ConstLabels: map[string]string{
+			"version": v.Version.Version,
+		},
+	})
+
+	httpRequestsTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: "http_requests_total",
+		Help: "Count of all HTTP requests",
+	}, []string{"code", "method"})
+
+	httpRequestDuration = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		Name: "http_request_duration_seconds",
+		Help: "Duration of all HTTP requests",
+	}, []string{"code", "handler", "method"})
+)
+
 func NewCmdRun(ctx context.Context) *cobra.Command {
-	var listenAddress string
+	var (
+		addr        string = ":8000"
+		metricsAddr string = ":8080"
+	)
 	cmd := &cobra.Command{
 		Use:               "run",
 		Short:             "Launch a Cloudflare DNS Proxy server",
@@ -41,15 +65,16 @@ func NewCmdRun(ctx context.Context) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			klog.Infof("Starting binary version %s+%s ...", v.Version.Version, v.Version.CommitHash)
 
-			return run(ctx, listenAddress)
+			return run(ctx, addr, metricsAddr)
 		},
 	}
-	cmd.Flags().StringVar(&listenAddress, "listen", ":8000", "Listen address.")
+	cmd.Flags().StringVar(&addr, "listen", addr, "Listen address.")
+	cmd.Flags().StringVar(&metricsAddr, "metrics-addr", metricsAddr, "The address the metric endpoint binds to.")
 
 	return cmd
 }
 
-func run(ctx context.Context, listenAddress string) error {
+func run(ctx context.Context, addr, metricsAddr string) error {
 	api, err := cloudflare.NewWithAPIToken(os.Getenv("CLOUDFLARE_API_TOKEN"))
 	if err != nil {
 		return err
@@ -63,14 +88,37 @@ func run(ctx context.Context, listenAddress string) error {
 		req.Header.Set("Authorization", "Bearer "+api.APIToken)
 	}
 
-	log.Printf("Listening at http://%s", listenAddress)
+	r := prometheus.NewRegistry()
+	r.MustRegister(httpRequestsTotal)
+	r.MustRegister(httpRequestDuration)
+	r.MustRegister(version)
+
+	log.Printf("Listening at http://%s", addr)
 	srv := http.Server{
-		Addr:    listenAddress,
-		Handler: proxy,
+		Addr: addr,
+		Handler: promhttp.InstrumentHandlerDuration(
+			httpRequestDuration,
+			promhttp.InstrumentHandlerCounter(httpRequestsTotal, proxy),
+		),
 	}
-	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
-		return errors.Wrap(err, "HTTP server ListenAndServe failed")
-	}
+	go func() {
+		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+			klog.ErrorS(err, "HTTP server ListenAndServe failed")
+		}
+	}()
+
+	go func() {
+		mux := http.NewServeMux()
+		mux.Handle("/metrics", promhttp.HandlerFor(r, promhttp.HandlerOpts{}))
+		metricsServer := http.Server{
+			Addr:    metricsAddr,
+			Handler: mux,
+		}
+		if err := metricsServer.ListenAndServe(); err != http.ErrServerClosed {
+			klog.ErrorS(err, "Metrics server ListenAndServe failed")
+		}
+	}()
+
 	<-ctx.Done()
 	return srv.Shutdown(ctx)
 }
