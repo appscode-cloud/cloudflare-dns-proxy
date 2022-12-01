@@ -57,7 +57,5 @@ jobs:
           files: |
             bin/cloudflare-dns-proxy-linux-amd64
             bin/cloudflare-dns-proxy-linux-arm64
-            bin/cloudflare-dns-proxy-darwin-amd64
-            bin/cloudflare-dns-proxy-darwin-arm64
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
