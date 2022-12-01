@@ -18,7 +18,7 @@ PRODUCT_OWNER_NAME := appscode
 PRODUCT_NAME       := cloudflare-dns-proxy
 ENFORCE_LICENSE    ?=
 
-GO_PKG   := kubeops.dev
+GO_PKG   := go.bytebuilders.dev
 REPO     := $(notdir $(shell pwd))
 BIN      := cloudflare-dns-proxy
 COMPRESS ?= no
