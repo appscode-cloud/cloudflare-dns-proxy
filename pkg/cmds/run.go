@@ -17,17 +17,24 @@ limitations under the License.
 package cmds
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"path"
+	"time"
 
 	"github.com/cloudflare/cloudflare-go"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
+	"gomodules.xyz/oneliners"
 	v "gomodules.xyz/x/version"
 	"k8s.io/klog/v2"
 )
@@ -49,13 +56,14 @@ var (
 	httpRequestDuration = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name: "http_request_duration_seconds",
 		Help: "Duration of all HTTP requests",
-	}, []string{"code", "handler", "method"})
+	}, []string{"code" /*, "handler"*/, "method"})
 )
 
 func NewCmdRun(ctx context.Context) *cobra.Command {
 	var (
-		addr        string = ":8000"
-		metricsAddr string = ":8080"
+		addr             string = ":8000"
+		metricsAddr      string = ":8080"
+		installerBaseURL string = "https://appscode.ninja"
 	)
 	cmd := &cobra.Command{
 		Use:               "run",
@@ -65,27 +73,36 @@ func NewCmdRun(ctx context.Context) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			klog.Infof("Starting binary version %s+%s ...", v.Version.Version, v.Version.CommitHash)
 
-			return run(ctx, addr, metricsAddr)
+			return run(ctx, addr, metricsAddr, installerBaseURL)
 		},
 	}
 	cmd.Flags().StringVar(&addr, "listen", addr, "Listen address.")
 	cmd.Flags().StringVar(&metricsAddr, "metrics-addr", metricsAddr, "The address the metric endpoint binds to.")
+	cmd.Flags().StringVar(&installerBaseURL, "installer-base-url", installerBaseURL, "ace-installer base url")
 
 	return cmd
 }
 
-func run(ctx context.Context, addr, metricsAddr string) error {
+func run(ctx context.Context, addr, metricsAddr, installerBaseURL string) error {
 	api, err := cloudflare.NewWithAPIToken(os.Getenv("CLOUDFLARE_API_TOKEN"))
 	if err != nil {
 		return err
 	}
-	target, _ := url.Parse(api.BaseURL)
+	target, err := url.Parse(api.BaseURL)
+	if err != nil {
+		return err
+	}
+	aceInstallerURL, err := url.Parse(installerBaseURL)
+	if err != nil {
+		return err
+	}
+
+	aceInstallerURL.Path = path.Join(aceInstallerURL.Path, "/api/v1/ace-installer/installer-meta")
+
 	proxy := httputil.NewSingleHostReverseProxy(target)
-	d := proxy.Director
-	proxy.Director = func(req *http.Request) {
-		d(req)
-		req.Host = ""
-		req.Header.Set("Authorization", "Bearer "+api.APIToken)
+	proxy.Transport = cloudflareTransport{
+		cfApiToken:      api.APIToken,
+		aceInstallerURL: aceInstallerURL.String(),
 	}
 
 	r := prometheus.NewRegistry()
@@ -121,4 +138,91 @@ func run(ctx context.Context, addr, metricsAddr string) error {
 
 	<-ctx.Done()
 	return srv.Shutdown(ctx)
+}
+
+type cloudflareTransport struct {
+	aceInstallerURL string
+	cfApiToken      string
+}
+
+func (rt cloudflareTransport) fetchInstallerMetadata(authHeader string) (InstallerMetadata, error) {
+	req, err := http.NewRequest(http.MethodGet, rt.aceInstallerURL, nil)
+	if err != nil {
+		return InstallerMetadata{}, err
+	}
+
+	req.Header.Set("Authorization", authHeader)
+	fmt.Println(authHeader, rt.aceInstallerURL)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return InstallerMetadata{}, err
+	}
+
+	meta := InstallerMetadata{}
+	if err = json.NewDecoder(resp.Body).Decode(&meta); err != nil {
+		return InstallerMetadata{}, err
+	}
+
+	return meta, nil
+}
+
+func (rt cloudflareTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	meta, err := rt.fetchInstallerMetadata(req.Header.Get("Authorization"))
+	if err != nil {
+		return nil, err
+	}
+
+	oneliners.PrettyJson(meta)
+
+	req.Host = ""
+	req.Header.Set("Authorization", "Bearer "+rt.cfApiToken)
+	u, err := url.Parse(req.RequestURI)
+	if err != nil {
+		return nil, err
+	}
+
+	domain := u.Query().Get("name")
+
+	if domain != meta.HostedURL {
+		cr := cloudflare.Response{
+			Success: false,
+			Errors:  []cloudflare.ResponseInfo{{Message: "domain mismatch"}},
+		}
+		data, err := json.Marshal(cr)
+		if err != nil {
+			return nil, err
+		}
+		return &http.Response{
+			StatusCode: http.StatusBadRequest,
+			Body:       io.NopCloser(bytes.NewReader(data)),
+		}, nil
+	}
+
+	//if data, err := httputil.DumpRequestOut(req, true); err == nil {
+	//	fmt.Println("REQUEST: >>>>>>>>>>>>>>>>>>>>>>>")
+	//	fmt.Println(string(data))
+	//}
+
+	resp, err := http.DefaultTransport.RoundTrip(req)
+	if err != nil {
+		return nil, fmt.Errorf("HTTP request failed: %w", err)
+	}
+	//if data, err := httputil.DumpResponse(resp, true); err == nil {
+	//	fmt.Println("RESPONSE: >>>>>>>>>>>>>>>>>>>>>>>")
+	//	fmt.Println(string(data))
+	//}
+	return resp, nil
+}
+
+type InstallerMetadata struct {
+	ID         string `json:"ID"`
+	Domain     string `json:"domain"`
+	HostedURL  string `json:"hostedURL"`
+	OwnerID    int64  `json:"ownerID"`
+	AuthorID   int64  `json:"authorID"`
+	AuthorName string `json:"authorName,omitempty"`
+	Production bool   `json:"production"`
+
+	CreateTimestamp time.Time `json:"createTimestamp"`
+	ExpiryTimestamp time.Time `json:"expiryTimestamp,omitempty"`
 }

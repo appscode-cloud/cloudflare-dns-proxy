@@ -88,6 +88,9 @@ gomodules.xyz/flags
 # gomodules.xyz/logs v0.0.6
 ## explicit; go 1.16
 gomodules.xyz/logs
+# gomodules.xyz/oneliners v0.0.0-20200730052119-bccc7758058b
+## explicit; go 1.14
+gomodules.xyz/oneliners
 # gomodules.xyz/sets v0.2.1
 ## explicit; go 1.14
 gomodules.xyz/sets
