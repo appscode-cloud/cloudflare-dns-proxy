@@ -3,12 +3,11 @@ module go.bytebuilders.dev/cloudflare-dns-proxy
 go 1.18
 
 require (
-	github.com/cloudflare/cloudflare-go v0.55.0
+	github.com/cloudflare/cloudflare-go v0.57.1
 	github.com/prometheus/client_golang v1.14.0
 	github.com/spf13/cobra v1.6.1
 	go.uber.org/automaxprocs v1.5.1
 	gomodules.xyz/logs v0.0.6
-	gomodules.xyz/oneliners v0.0.0-20200730052119-bccc7758058b
 	gomodules.xyz/signals v0.2.0
 	gomodules.xyz/x v0.0.14
 	k8s.io/klog/v2 v2.80.1

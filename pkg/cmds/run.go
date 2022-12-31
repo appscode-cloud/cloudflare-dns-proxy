@@ -34,7 +34,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
-	"gomodules.xyz/oneliners"
 	v "gomodules.xyz/x/version"
 	"k8s.io/klog/v2"
 )
@@ -56,14 +55,14 @@ var (
 	httpRequestDuration = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name: "http_request_duration_seconds",
 		Help: "Duration of all HTTP requests",
-	}, []string{"code" /*, "handler"*/, "method"})
+	}, []string{"code", "method"})
 )
 
 func NewCmdRun(ctx context.Context) *cobra.Command {
 	var (
-		addr             string = ":8000"
-		metricsAddr      string = ":8080"
-		installerBaseURL string = "https://appscode.ninja"
+		addr             = ":8000"
+		metricsAddr      = ":8080"
+		installerBaseURL = "https://appscode.ninja"
 	)
 	cmd := &cobra.Command{
 		Use:               "run",
@@ -171,8 +170,6 @@ func (rt cloudflareTransport) RoundTrip(req *http.Request) (*http.Response, erro
 	if err != nil {
 		return nil, err
 	}
-
-	oneliners.PrettyJson(meta)
 
 	req.Host = ""
 	req.Header.Set("Authorization", "Bearer "+rt.cfApiToken)
