@@ -106,7 +106,6 @@ func run(ctx context.Context, addr, metricsAddr string) error {
 	r.MustRegister(httpRequestDuration)
 	r.MustRegister(version)
 
-	log.Printf("Listening at http://%s", addr)
 	srv := http.Server{
 		Addr: addr,
 		Handler: promhttp.InstrumentHandlerDuration(
@@ -115,6 +114,7 @@ func run(ctx context.Context, addr, metricsAddr string) error {
 		),
 	}
 	go func() {
+		log.Printf("API server listening at http://%s", addr)
 		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
 			klog.ErrorS(err, "HTTP server ListenAndServe failed")
 		}
@@ -130,6 +130,7 @@ func run(ctx context.Context, addr, metricsAddr string) error {
 			Addr:    metricsAddr,
 			Handler: mux,
 		}
+		log.Printf("Telemetry server listening at http://%s", metricsAddr)
 		if err := metricsServer.ListenAndServe(); err != http.ErrServerClosed {
 			klog.ErrorS(err, "Metrics server ListenAndServe failed")
 		}
