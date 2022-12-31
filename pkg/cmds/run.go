@@ -122,6 +122,9 @@ func run(ctx context.Context, addr, metricsAddr string) error {
 
 	go func() {
 		mux := http.NewServeMux()
+		mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			_, _ = w.Write([]byte("OK"))
+		}))
 		mux.Handle("/metrics", promhttp.HandlerFor(r, promhttp.HandlerOpts{}))
 		metricsServer := http.Server{
 			Addr:    metricsAddr,
