@@ -30,6 +30,8 @@ import (
 	"path"
 	"time"
 
+	"go.bytebuilders.dev/license-verifier/info"
+
 	"github.com/cloudflare/cloudflare-go"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -60,9 +62,8 @@ var (
 
 func NewCmdRun(ctx context.Context) *cobra.Command {
 	var (
-		addr             = ":8000"
-		metricsAddr      = ":8080"
-		installerBaseURL = "https://appscode.ninja"
+		addr        = ":8000"
+		metricsAddr = ":8080"
 	)
 	cmd := &cobra.Command{
 		Use:               "run",
@@ -72,17 +73,16 @@ func NewCmdRun(ctx context.Context) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			klog.Infof("Starting binary version %s+%s ...", v.Version.Version, v.Version.CommitHash)
 
-			return run(ctx, addr, metricsAddr, installerBaseURL)
+			return run(ctx, addr, metricsAddr)
 		},
 	}
 	cmd.Flags().StringVar(&addr, "listen", addr, "Listen address.")
 	cmd.Flags().StringVar(&metricsAddr, "metrics-addr", metricsAddr, "The address the metric endpoint binds to.")
-	cmd.Flags().StringVar(&installerBaseURL, "installer-base-url", installerBaseURL, "ace-installer base url")
 
 	return cmd
 }
 
-func run(ctx context.Context, addr, metricsAddr, installerBaseURL string) error {
+func run(ctx context.Context, addr, metricsAddr string) error {
 	api, err := cloudflare.NewWithAPIToken(os.Getenv("CLOUDFLARE_API_TOKEN"))
 	if err != nil {
 		return err
@@ -91,11 +91,8 @@ func run(ctx context.Context, addr, metricsAddr, installerBaseURL string) error 
 	if err != nil {
 		return err
 	}
-	aceInstallerURL, err := url.Parse(installerBaseURL)
-	if err != nil {
-		return err
-	}
 
+	aceInstallerURL := info.APIServerAddress()
 	aceInstallerURL.Path = path.Join(aceInstallerURL.Path, "/api/v1/ace-installer/installer-meta")
 
 	proxy := httputil.NewSingleHostReverseProxy(target)
@@ -194,21 +191,7 @@ func (rt cloudflareTransport) RoundTrip(req *http.Request) (*http.Response, erro
 			Body:       io.NopCloser(bytes.NewReader(data)),
 		}, nil
 	}
-
-	//if data, err := httputil.DumpRequestOut(req, true); err == nil {
-	//	fmt.Println("REQUEST: >>>>>>>>>>>>>>>>>>>>>>>")
-	//	fmt.Println(string(data))
-	//}
-
-	resp, err := http.DefaultTransport.RoundTrip(req)
-	if err != nil {
-		return nil, fmt.Errorf("HTTP request failed: %w", err)
-	}
-	//if data, err := httputil.DumpResponse(resp, true); err == nil {
-	//	fmt.Println("RESPONSE: >>>>>>>>>>>>>>>>>>>>>>>")
-	//	fmt.Println(string(data))
-	//}
-	return resp, nil
+	return http.DefaultTransport.RoundTrip(req)
 }
 
 type InstallerMetadata struct {
