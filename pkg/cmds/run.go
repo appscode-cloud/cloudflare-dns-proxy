@@ -62,8 +62,9 @@ var (
 
 func NewCmdRun(ctx context.Context) *cobra.Command {
 	var (
-		addr        = ":8000"
-		metricsAddr = ":8080"
+		addr             = ":8000"
+		metricsAddr      = ":8080"
+		apiServerAddress string
 	)
 	cmd := &cobra.Command{
 		Use:               "run",
@@ -73,16 +74,17 @@ func NewCmdRun(ctx context.Context) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			klog.Infof("Starting binary version %s+%s ...", v.Version.Version, v.Version.CommitHash)
 
-			return run(ctx, addr, metricsAddr)
+			return run(ctx, addr, metricsAddr, apiServerAddress)
 		},
 	}
 	cmd.Flags().StringVar(&addr, "listen", addr, "Listen address.")
 	cmd.Flags().StringVar(&metricsAddr, "metrics-addr", metricsAddr, "The address the metric endpoint binds to.")
+	cmd.Flags().StringVar(&apiServerAddress, "api-server-addr", apiServerAddress, "The API server address")
 
 	return cmd
 }
 
-func run(ctx context.Context, addr, metricsAddr string) error {
+func run(ctx context.Context, addr, metricsAddr, apiServerAddress string) error {
 	api, err := cloudflare.NewWithAPIToken(os.Getenv("CLOUDFLARE_API_TOKEN"))
 	if err != nil {
 		return err
@@ -92,7 +94,10 @@ func run(ctx context.Context, addr, metricsAddr string) error {
 		return err
 	}
 
-	aceInstallerURL := info.APIServerAddress()
+	aceInstallerURL, err := info.APIServerAddress(apiServerAddress)
+	if err != nil {
+		return err
+	}
 	aceInstallerURL.Path = path.Join(aceInstallerURL.Path, "/api/v1/ace-installer/installer-meta")
 
 	proxy := httputil.NewSingleHostReverseProxy(target)

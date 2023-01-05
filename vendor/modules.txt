@@ -1,13 +1,16 @@
 # github.com/Masterminds/semver/v3 v3.1.1
 ## explicit; go 1.12
 github.com/Masterminds/semver/v3
+# github.com/PuerkitoBio/purell v1.2.0
+## explicit; go 1.19
+github.com/PuerkitoBio/purell
 # github.com/beorn7/perks v1.0.1
 ## explicit; go 1.11
 github.com/beorn7/perks/quantile
 # github.com/cespare/xxhash/v2 v2.1.2
 ## explicit; go 1.11
 github.com/cespare/xxhash/v2
-# github.com/cloudflare/cloudflare-go v0.57.1
+# github.com/cloudflare/cloudflare-go v0.58.1
 ## explicit; go 1.17
 github.com/cloudflare/cloudflare-go
 # github.com/go-logr/logr v1.2.3
@@ -30,7 +33,7 @@ github.com/google/gofuzz
 # github.com/hashicorp/go-cleanhttp v0.5.2
 ## explicit; go 1.13
 github.com/hashicorp/go-cleanhttp
-# github.com/hashicorp/go-retryablehttp v0.7.1
+# github.com/hashicorp/go-retryablehttp v0.7.2
 ## explicit; go 1.13
 github.com/hashicorp/go-retryablehttp
 # github.com/inconshreveable/mousetrap v1.0.1
@@ -72,7 +75,7 @@ github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.5
 ## explicit; go 1.12
 github.com/spf13/pflag
-# go.bytebuilders.dev/license-verifier v0.12.1
+# go.bytebuilders.dev/license-verifier v0.12.2
 ## explicit; go 1.18
 go.bytebuilders.dev/license-verifier/apis/licenses
 go.bytebuilders.dev/license-verifier/info
@@ -99,6 +102,7 @@ golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
+golang.org/x/text/width
 # golang.org/x/time v0.0.0-20220224211638-0e9765cccd65
 ## explicit
 golang.org/x/time/rate
