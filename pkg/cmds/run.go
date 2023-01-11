@@ -237,7 +237,9 @@ func (rt cloudflareTransport) check(req *http.Request) (*client.InstallerMetadat
 		"DELETE http://dns-proxy.appscode.ninja/zones/${zoneID}/dns_records/${recordID}
 		"POST http://dns-proxy.appscode.ninja/zones/${zoneID}/dns_records
 	*/
-	if (req.Method == http.MethodPost || req.Method == http.MethodDelete) && req.Body != http.NoBody {
+	if (req.Method == http.MethodPost || req.Method == http.MethodDelete) &&
+		req.Body != nil &&
+		req.Body != http.NoBody {
 		buf := bufferPool.Get().(*bytes.Buffer)
 		defer bufferPool.Put(buf)
 		buf.Reset()
