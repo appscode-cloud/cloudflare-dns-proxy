@@ -20,7 +20,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -28,8 +27,8 @@ import (
 	"net/url"
 	"os"
 	"path"
-	"time"
 
+	"go.bytebuilders.dev/lib-selfhost/client"
 	"go.bytebuilders.dev/license-verifier/info"
 
 	"github.com/cloudflare/cloudflare-go"
@@ -94,16 +93,16 @@ func run(ctx context.Context, addr, metricsAddr, apiServerAddress string) error 
 		return err
 	}
 
-	aceInstallerURL, err := info.APIServerAddress(apiServerAddress)
+	authEndpoint, err := info.APIServerAddress(apiServerAddress)
 	if err != nil {
 		return err
 	}
-	aceInstallerURL.Path = path.Join(aceInstallerURL.Path, "/api/v1/ace-installer/installer-meta")
+	authEndpoint.Path = path.Join(authEndpoint.Path, "/api/v1/ace-installer/installer-meta")
 
 	proxy := httputil.NewSingleHostReverseProxy(target)
 	proxy.Transport = cloudflareTransport{
-		cfApiToken:      api.APIToken,
-		aceInstallerURL: aceInstallerURL.String(),
+		apiToken:     api.APIToken,
+		authEndpoint: authEndpoint.String(),
 	}
 
 	r := prometheus.NewRegistry()
@@ -146,39 +145,18 @@ func run(ctx context.Context, addr, metricsAddr, apiServerAddress string) error 
 }
 
 type cloudflareTransport struct {
-	aceInstallerURL string
-	cfApiToken      string
-}
-
-func (rt cloudflareTransport) fetchInstallerMetadata(authHeader string) (InstallerMetadata, error) {
-	req, err := http.NewRequest(http.MethodGet, rt.aceInstallerURL, nil)
-	if err != nil {
-		return InstallerMetadata{}, err
-	}
-
-	req.Header.Set("Authorization", authHeader)
-	fmt.Println(authHeader, rt.aceInstallerURL)
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return InstallerMetadata{}, err
-	}
-
-	meta := InstallerMetadata{}
-	if err = json.NewDecoder(resp.Body).Decode(&meta); err != nil {
-		return InstallerMetadata{}, err
-	}
-
-	return meta, nil
+	authEndpoint string
+	apiToken     string
 }
 
 func (rt cloudflareTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	meta, err := rt.fetchInstallerMetadata(req.Header.Get("Authorization"))
+	meta, err := client.GetInstallerMetadata(rt.authEndpoint, req.Header.Get("Authorization"))
 	if err != nil {
 		return nil, err
 	}
 
 	req.Host = ""
-	req.Header.Set("Authorization", "Bearer "+rt.cfApiToken)
+	req.Header.Set("Authorization", "Bearer "+rt.apiToken)
 	u, err := url.Parse(req.RequestURI)
 	if err != nil {
 		return nil, err
@@ -186,7 +164,7 @@ func (rt cloudflareTransport) RoundTrip(req *http.Request) (*http.Response, erro
 
 	domain := u.Query().Get("name")
 
-	if domain != meta.HostedURL {
+	if domain != meta.HostedDomain {
 		cr := cloudflare.Response{
 			Success: false,
 			Errors:  []cloudflare.ResponseInfo{{Message: "domain mismatch"}},
@@ -201,17 +179,4 @@ func (rt cloudflareTransport) RoundTrip(req *http.Request) (*http.Response, erro
 		}, nil
 	}
 	return http.DefaultTransport.RoundTrip(req)
-}
-
-type InstallerMetadata struct {
-	ID         string `json:"ID"`
-	Domain     string `json:"domain"`
-	HostedURL  string `json:"hostedURL"`
-	OwnerID    int64  `json:"ownerID"`
-	AuthorID   int64  `json:"authorID"`
-	AuthorName string `json:"authorName,omitempty"`
-	Production bool   `json:"production"`
-
-	CreateTimestamp time.Time `json:"createTimestamp"`
-	ExpiryTimestamp time.Time `json:"expiryTimestamp,omitempty"`
 }
