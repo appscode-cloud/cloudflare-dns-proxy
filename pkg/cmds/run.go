@@ -174,6 +174,7 @@ type cloudflareTransport struct {
 func (rt cloudflareTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	meta, err := rt.check(req)
 	if err != nil {
+		fmt.Println(err.Error())
 		cr := cloudflare.Response{
 			Success: false,
 			Errors:  []cloudflare.ResponseInfo{{Message: err.Error()}},
