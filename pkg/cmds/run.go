@@ -126,7 +126,7 @@ func run(ctx context.Context, addr, metricsAddr, apiServerAddress string, debug 
 	r.MustRegister(version)
 
 	router := chi.NewRouter()
-	router.Use(middleware.RequestID)
+	// router.Use(middleware.RequestID)
 	router.Use(middleware.RealIP)
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
