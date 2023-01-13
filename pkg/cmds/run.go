@@ -75,7 +75,7 @@ func NewCmdRun(ctx context.Context) *cobra.Command {
 	var (
 		addr             = ":8000"
 		metricsAddr      = ":8080"
-		apiServerAddress = "appcode.ninja"
+		apiServerAddress = ""
 		debug            = false
 	)
 	cmd := &cobra.Command{
@@ -172,6 +172,13 @@ type cloudflareTransport struct {
 }
 
 func (rt cloudflareTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	if rt.debug {
+		if data, err := httputil.DumpRequestOut(req, true); err == nil {
+			fmt.Println("REQUEST: >>>>>>>>>>>>>>>>>>>>>>>")
+			fmt.Println(string(data))
+		}
+	}
+
 	meta, err := rt.check(req)
 	if err != nil {
 		cr := cloudflare.Response{
@@ -181,6 +188,10 @@ func (rt cloudflareTransport) RoundTrip(req *http.Request) (*http.Response, erro
 		data, err := json.Marshal(cr)
 		if err != nil {
 			return nil, err
+		}
+		if rt.debug {
+			fmt.Println("RESPONSE_403: >>>>>>>>>>>>>>>>>>>>>>>")
+			fmt.Println(string(data))
 		}
 		return &http.Response{
 			StatusCode: http.StatusForbidden,
@@ -193,12 +204,8 @@ func (rt cloudflareTransport) RoundTrip(req *http.Request) (*http.Response, erro
 		if err != nil {
 			return nil, err
 		}
+		fmt.Println("INSTALLER_METADATA: >>>>>>>>>>>>>>>>>>>>>>>")
 		fmt.Println(string(md))
-
-		if data, err := httputil.DumpRequestOut(req, true); err == nil {
-			fmt.Println("REQUEST: >>>>>>>>>>>>>>>>>>>>>>>")
-			fmt.Println(string(data))
-		}
 	}
 
 	req.Host = ""
