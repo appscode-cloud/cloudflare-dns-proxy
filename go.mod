@@ -52,11 +52,11 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	go.bytebuilders.dev/installer v0.1.1-0.20230110092420-5ce925897d0f // indirect
 	go.openviz.dev/installer v0.0.0-20230104082956-b1c59b1b779d // indirect
-	golang.org/x/net v0.4.1-0.20221223171606-2aa82152a53e // indirect
+	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/oauth2 v0.3.0 // indirect
-	golang.org/x/sys v0.3.1-0.20230101012411-b751db56c781 // indirect
-	golang.org/x/term v0.3.0 // indirect
-	golang.org/x/text v0.5.1-0.20221206182405-ec5565b1b747 // indirect
+	golang.org/x/sys v0.5.0 // indirect
+	golang.org/x/term v0.5.0 // indirect
+	golang.org/x/text v0.7.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	gomodules.xyz/clock v0.0.0-20200817085942-06523dba733f // indirect
 	gomodules.xyz/flags v0.1.3 // indirect
@@ -74,7 +74,7 @@ require (
 	k8s.io/utils v0.0.0-20221128185143-99ec85e7a448 // indirect
 	kmodules.xyz/client-go v0.25.15 // indirect
 	kmodules.xyz/objectstore-api v0.25.1-0.20221104003322-f0289b5b6ca2 // indirect
-	kubeops.dev/external-dns-operator v0.0.3 // indirect
+	kubeops.dev/external-dns-operator v0.0.5-0.20230303042940-7577544216ef // indirect
 	kubeops.dev/installer v0.0.0-20230102190911-48de263490ae // indirect
 	sigs.k8s.io/controller-runtime v0.13.1 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
