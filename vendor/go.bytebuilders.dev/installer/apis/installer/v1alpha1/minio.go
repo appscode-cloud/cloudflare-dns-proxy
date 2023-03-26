@@ -73,10 +73,18 @@ type MinioSpec struct {
 	Affinity     *core.Affinity       `json:"affinity"`
 	Persistence  PersistenceSpec      `json:"persistence"`
 	StorageClass LocalObjectReference `json:"storageClass"`
-	Minio        MinIOCredentials     `json:"minio"`
+	Ingress      MinioIngress         `json:"ingress"`
+	Minio        MinioConfig          `json:"minio"`
 }
 
-type MinIOCredentials struct {
+type MinioIngress struct {
+	Enabled     bool              `json:"enabled"`
+	ClassName   string            `json:"className"`
+	Annotations map[string]string `json:"annotations"`
+	Domain      string            `json:"domain"`
+}
+
+type MinioConfig struct {
 	Auth MinioAuth `json:"auth"`
 	TLS  MinioTLS  `json:"tls"`
 }
@@ -87,6 +95,8 @@ type MinioAuth struct {
 }
 
 type MinioTLS struct {
+	Enable bool                 `json:"enable"`
+	Mount  bool                 `json:"mount"`
 	Issuer CertificateIssuerRef `json:"issuer"`
 	Secret LocalObjectReference `json:"secret"`
 }

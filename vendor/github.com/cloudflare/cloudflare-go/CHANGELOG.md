@@ -1,4 +1,113 @@
-## 0.59.0 (Unreleased)
+## 0.64.0 (Unreleased)
+
+## 0.63.0 (15th March, 2023)
+
+BREAKING CHANGES:
+
+* tunnel: renamed `Tunnel` to `GetTunnel` ([#1227](https://github.com/cloudflare/cloudflare-go/issues/1227))
+* tunnel: renamed `Tunnels` to `ListTunnels` ([#1227](https://github.com/cloudflare/cloudflare-go/issues/1227))
+
+ENHANCEMENTS:
+
+* access_organization: add ui_read_only_toggle_reason field ([#1181](https://github.com/cloudflare/cloudflare-go/issues/1181))
+* added audit_ssh to gateway actions, updated gateway rule settings ([#1226](https://github.com/cloudflare/cloudflare-go/issues/1226))
+* addressing: Add `Address Map` support ([#1232](https://github.com/cloudflare/cloudflare-go/issues/1232))
+* teams_account: add support for `check_disks` ([#1197](https://github.com/cloudflare/cloudflare-go/issues/1197))
+* tunnel: updated parameters to latest API docs ([#1227](https://github.com/cloudflare/cloudflare-go/issues/1227))
+
+DEPENDENCIES:
+
+* deps: bumps github.com/urfave/cli/v2 from 2.24.4 to 2.25.0 ([#1229](https://github.com/cloudflare/cloudflare-go/issues/1229))
+* deps: bumps golang.org/x/net from 0.7.0 to 0.8.0 ([#1228](https://github.com/cloudflare/cloudflare-go/issues/1228))
+
+## 0.62.0 (1st March, 2023)
+
+ENHANCEMENTS:
+
+* dex_test: add CRUD functionality for DEX test configurations ([#1209](https://github.com/cloudflare/cloudflare-go/issues/1209))
+* dlp: Adds support for partial payload logging ([#1212](https://github.com/cloudflare/cloudflare-go/issues/1212))
+* teams_accounts: Add new root_certificate_installation_enabled field ([#1208](https://github.com/cloudflare/cloudflare-go/issues/1208))
+* teams_rules: Add `untrusted_cert` rule setting ([#1214](https://github.com/cloudflare/cloudflare-go/issues/1214))
+* tunnels: automatically paginate `ListTunnels` ([#1206](https://github.com/cloudflare/cloudflare-go/issues/1206))
+
+BUG FIXES:
+
+* dex_test: use dex test types and json struct mappings instead of managed networks ([#1213](https://github.com/cloudflare/cloudflare-go/issues/1213))
+* dns: dont reuse DNSListResponse when using pagination to avoid Proxied pointer overwrite ([#1222](https://github.com/cloudflare/cloudflare-go/issues/1222))
+
+DEPENDENCIES:
+
+* deps: bumps github.com/stretchr/testify from 1.8.1 to 1.8.2 ([#1220](https://github.com/cloudflare/cloudflare-go/issues/1220))
+* deps: bumps github.com/urfave/cli/v2 from 2.24.3 to 2.24.4 ([#1210](https://github.com/cloudflare/cloudflare-go/issues/1210))
+* deps: bumps golang.org/x/net from 0.0.0-20220722155237-a158d28d115b to 0.7.0 ([#1218](https://github.com/cloudflare/cloudflare-go/issues/1218))
+* deps: bumps golang.org/x/net from 0.0.0-20220722155237-a158d28d115b to 0.7.0 ([#1219](https://github.com/cloudflare/cloudflare-go/issues/1219))
+* deps: bumps golang.org/x/text from 0.3.7 to 0.3.8 ([#1215](https://github.com/cloudflare/cloudflare-go/issues/1215))
+* deps: bumps golang.org/x/text from 0.3.7 to 0.3.8 ([#1216](https://github.com/cloudflare/cloudflare-go/issues/1216))
+* deps: bumps golang.org/x/time from 0.0.0-20220224211638-0e9765cccd65 to 0.3.0 ([#1217](https://github.com/cloudflare/cloudflare-go/issues/1217))
+
+## 0.61.0 (15th February, 2023)
+
+ENHANCEMENTS:
+
+* cloudflare: make it clearer when we hit a server error and to retry later ([#1207](https://github.com/cloudflare/cloudflare-go/issues/1207))
+* devices_policy: Add new exclude_office_ips field to policy ([#1205](https://github.com/cloudflare/cloudflare-go/issues/1205))
+* dlp_profile: Use int rather than uint for allowed_match_count field ([#1200](https://github.com/cloudflare/cloudflare-go/issues/1200))
+
+BUG FIXES:
+
+* dns: always send `tags` to allow clearing ([#1196](https://github.com/cloudflare/cloudflare-go/issues/1196))
+* stream: renamed `RequiredSignedURLs` to `RequireSignedURLs` ([#1202](https://github.com/cloudflare/cloudflare-go/issues/1202))
+
+DEPENDENCIES:
+
+* deps: bumps github.com/urfave/cli/v2 from 2.24.2 to 2.24.3 ([#1199](https://github.com/cloudflare/cloudflare-go/issues/1199))
+
+## 0.60.0 (1st February, 2023)
+
+BREAKING CHANGES:
+
+* queues: UpdateQueue has been updated to match the API and now correctly updates a Queue's name ([#1188](https://github.com/cloudflare/cloudflare-go/issues/1188))
+
+ENHANCEMENTS:
+
+* dlp_profile: Add new allowed_match_count field to profiles ([#1193](https://github.com/cloudflare/cloudflare-go/issues/1193))
+* dns: allow sending empty strings to remove comments ([#1195](https://github.com/cloudflare/cloudflare-go/issues/1195))
+* magic_transit_ipsec_tunnel: makes customer endpoint an optional field for ipsec tunnel creation ([#1185](https://github.com/cloudflare/cloudflare-go/issues/1185))
+* rulesets: add support for `score_per_period` and `score_response_header_name` ([#1183](https://github.com/cloudflare/cloudflare-go/issues/1183))
+
+DEPENDENCIES:
+
+* deps: bumps dependabot/fetch-metadata from 1.3.5 to 1.3.6 ([#1184](https://github.com/cloudflare/cloudflare-go/issues/1184))
+* deps: bumps github.com/urfave/cli/v2 from 2.23.7 to 2.24.1 ([#1180](https://github.com/cloudflare/cloudflare-go/issues/1180))
+* deps: bumps github.com/urfave/cli/v2 from 2.24.1 to 2.24.2 ([#1191](https://github.com/cloudflare/cloudflare-go/issues/1191))
+* deps: bumps goreleaser/goreleaser-action from 4.1.0 to 4.2.0 ([#1192](https://github.com/cloudflare/cloudflare-go/issues/1192))
+
+## 0.59.0 (January 18th, 2023)
+
+BREAKING CHANGES:
+
+* dns: remove these read-only fields from `UpdateDNSRecordParams`: `CreatedOn`, `ModifiedOn`, `Meta`, `ZoneID`, `ZoneName`, `Proxiable`, and `Locked` ([#1170](https://github.com/cloudflare/cloudflare-go/issues/1170))
+* dns: the fields `CreatedOn` and `ModifiedOn` are removed from `ListDNSRecordsParams` ([#1173](https://github.com/cloudflare/cloudflare-go/issues/1173))
+
+NOTES:
+
+* dns: remove additional lookup from `Update` operations when `Name` or `Type` was omitted ([#1170](https://github.com/cloudflare/cloudflare-go/issues/1170))
+
+ENHANCEMENTS:
+
+* access_organization: add user_seat_expiration_inactive_time field ([#1159](https://github.com/cloudflare/cloudflare-go/issues/1159))
+* dns: `GetDNSRecord`, `UpdateDNSRecord` and `DeleteDNSRecord` now return the new, dedicated error `ErrMissingDNSRecordID` when an empty DNS record ID is given. ([#1174](https://github.com/cloudflare/cloudflare-go/issues/1174))
+* dns: the URL parameter `tag-match` for listing DNS records is now supported as the field `TagMatch` in `ListDNSRecordsParams` ([#1173](https://github.com/cloudflare/cloudflare-go/issues/1173))
+* dns: update default `per_page` attribute to 100 records ([#1171](https://github.com/cloudflare/cloudflare-go/issues/1171))
+* teams_rules: adds support for Egress Policies ([#1142](https://github.com/cloudflare/cloudflare-go/issues/1142))
+* workers: Add support for compatibility_date and compatibility_flags when upoading a worker script ([#1177](https://github.com/cloudflare/cloudflare-go/issues/1177))
+* workers: script upload now supports Queues bindings ([#1176](https://github.com/cloudflare/cloudflare-go/issues/1176))
+
+BUG FIXES:
+
+* dns: don't send "priority" for list operations as it isn't supported and is only used for internal filtering ([#1167](https://github.com/cloudflare/cloudflare-go/issues/1167))
+* dns: the field `Tags` in `ListDNSRecordsParams` was not correctly serialized into URL queries ([#1173](https://github.com/cloudflare/cloudflare-go/issues/1173))
+* managednetworks: Update should be PUT ([#1172](https://github.com/cloudflare/cloudflare-go/issues/1172))
 
 ## 0.58.1 (January 5th, 2023)
 

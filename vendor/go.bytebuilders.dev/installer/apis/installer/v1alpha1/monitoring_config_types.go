@@ -18,16 +18,15 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	kubeops_installer "kubeops.dev/installer/apis/installer/v1alpha1"
 )
 
 const (
-	ResourceKindOpscenterConfig = "OpscenterConfig"
-	ResourceOpscenterConfig     = "opscenterconfig"
-	ResourceOpscenterConfigs    = "opscenterconfigs"
+	ResourceKindMonitoringConfig = "MonitoringConfig"
+	ResourceMonitoringConfig     = "monitoringconfig"
+	ResourceMonitoringConfigs    = "monitoringconfigs"
 )
 
-// OpscenterConfig defines the schama for OpscenterConfig Installer.
+// MonitoringConfig defines the schama for MonitoringConfig Installer.
 
 // +genclient
 // +genclient:skipVerbs=updateStatus
@@ -35,46 +34,25 @@ const (
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // +kubebuilder:object:root=true
-// +kubebuilder:resource:path=opscenterconfigs,singular=opscenterconfig,categories={kubeops,appscode}
-type OpscenterConfig struct {
+// +kubebuilder:resource:path=monitoringconfigs,singular=monitoringconfig,categories={kubeops,appscode}
+type MonitoringConfig struct {
 	metav1.TypeMeta   `json:",inline,omitempty"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-	Spec              OpscenterConfigSpec `json:"spec,omitempty"`
+	Spec              MonitoringConfigSpec `json:"spec,omitempty"`
 }
 
-// OpscenterConfigSpec is the schema for OpscenterConfig Operator values file
-type OpscenterConfigSpec struct {
-	NameOverride     string                      `json:"nameOverride"`
-	FullnameOverride string                      `json:"fullnameOverride"`
-	Global           OpscenterConfigGlobalValues `json:"global"`
-	Panopticon       PanopticonSpec              `json:"panopticon"`
-	UiPreset         EmbeddedUiPresetsSpec       `json:"ui-presets"`
-	Grafana          GrafanaConfig               `json:"grafana"`
-	Prometheus       PrometheusConfig            `json:"prometheus"`
-}
-
-type OpscenterConfigGlobalValues struct {
-	License          string            `json:"license"`
-	Registry         string            `json:"registry"`
-	RegistryFQDN     string            `json:"registryFQDN"`
-	ImagePullSecrets []string          `json:"imagePullSecrets"`
-	Monitoring       ClusterMonitoring `json:"monitoring"`
+// MonitoringConfigSpec is the schema for MonitoringConfig Operator values file
+type MonitoringConfigSpec struct {
+	NameOverride     string           `json:"nameOverride"`
+	FullnameOverride string           `json:"fullnameOverride"`
+	Grafana          GrafanaConfig    `json:"grafana"`
+	Prometheus       PrometheusConfig `json:"prometheus"`
 }
 
 type ClusterMonitoring struct {
 	Agent          MonitoringAgent       `json:"agent"`
 	ServiceMonitor *ServiceMonitorLabels `json:"serviceMonitor"`
 	Alert          *ServiceMonitorLabels `json:"alert"`
-}
-
-type PanopticonSpec struct {
-	Enabled                           *bool `json:"enabled"`
-	*kubeops_installer.PanopticonSpec `json:",inline,omitempty"`
-}
-
-type EmbeddedUiPresetsSpec struct {
-	Enabled        *bool `json:"enabled"`
-	*UiPresetsSpec `json:",inline,omitempty"`
 }
 
 type GrafanaConfig struct {
@@ -125,10 +103,10 @@ type TLSConfig struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// OpscenterConfigList is a list of OpscenterConfigs
-type OpscenterConfigList struct {
+// MonitoringConfigList is a list of MonitoringConfigs
+type MonitoringConfigList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	// Items is a list of OpscenterConfig CRD objects
-	Items []OpscenterConfig `json:"items,omitempty"`
+	// Items is a list of MonitoringConfig CRD objects
+	Items []MonitoringConfig `json:"items,omitempty"`
 }

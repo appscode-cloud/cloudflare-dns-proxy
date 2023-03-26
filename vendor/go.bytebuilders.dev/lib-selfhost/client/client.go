@@ -28,14 +28,17 @@ import (
 type InstallerMetadata struct {
 	ID string `json:"ID"`
 
-	DeploymentType  api.DeploymentType `json:"deploymentType"`
-	RequestedDomain string             `json:"requestedDomain"`
-	HostedDomain    string             `json:"hostedDomain,omitempty"`
-	OwnerID         int64              `json:"ownerID"`
-	RequesterID     int64              `json:"requesterID"`
-	RequesterName   string             `json:"requesterName,omitempty"`
-	RequesterEmail  string             `json:"requesterEmail,omitempty"`
-	ClusterID       string             `json:"clusterID"`
+	DeploymentType       api.DeploymentType `json:"deploymentType"`
+	RequestedDomain      string             `json:"requestedDomain"`
+	HostedDomain         string             `json:"hostedDomain,omitempty"`
+	OwnerID              int64              `json:"-"`
+	OwnerName            string             `json:"ownerName"`
+	RequesterID          int64              `json:"-"`
+	RequesterDisplayName string             `json:"requesterDisplayName,omitempty"`
+	RequesterUsername    string             `json:"requesterUsername,omitempty"`
+	AdminDisplayName     string             `json:"adminDisplayName"`
+	AdminEmail           string             `json:"adminEmail"`
+	ClusterID            string             `json:"clusterID"`
 
 	CreateTimestamp metav1.Time `json:"createTimestamp"`
 	ExpiryTimestamp metav1.Time `json:"expiryTimestamp,omitempty"`

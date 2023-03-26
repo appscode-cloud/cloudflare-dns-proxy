@@ -10,8 +10,8 @@ github.com/beorn7/perks/quantile
 # github.com/cespare/xxhash/v2 v2.2.0
 ## explicit; go 1.11
 github.com/cespare/xxhash/v2
-# github.com/cloudflare/cloudflare-go v0.58.1
-## explicit; go 1.17
+# github.com/cloudflare/cloudflare-go v0.63.0
+## explicit; go 1.18
 github.com/cloudflare/cloudflare-go
 # github.com/davecgh/go-spew v1.1.1
 ## explicit
@@ -23,7 +23,7 @@ github.com/emicklei/go-restful/v3/log
 # github.com/evanphx/json-patch/v5 v5.6.0
 ## explicit; go 1.12
 github.com/evanphx/json-patch/v5
-# github.com/go-chi/chi/v5 v5.0.7
+# github.com/go-chi/chi/v5 v5.0.8
 ## explicit; go 1.14
 github.com/go-chi/chi/v5
 github.com/go-chi/chi/v5/middleware
@@ -134,49 +134,48 @@ github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.5
 ## explicit; go 1.12
 github.com/spf13/pflag
-# go.bytebuilders.dev/installer v0.1.1-0.20230110092420-5ce925897d0f
+# go.bytebuilders.dev/installer v0.1.1-0.20230326100451-ce204a3bffd7
 ## explicit; go 1.18
 go.bytebuilders.dev/installer/apis/installer
 go.bytebuilders.dev/installer/apis/installer/v1alpha1
-# go.bytebuilders.dev/lib-selfhost v0.0.0-20230111043008-3632af35d126
+# go.bytebuilders.dev/lib-selfhost v0.0.1
 ## explicit; go 1.18
 go.bytebuilders.dev/lib-selfhost/client
-# go.bytebuilders.dev/license-verifier v0.12.2
+# go.bytebuilders.dev/license-verifier v0.13.0
 ## explicit; go 1.18
 go.bytebuilders.dev/license-verifier/apis/licenses
 go.bytebuilders.dev/license-verifier/info
-# go.openviz.dev/installer v0.0.0-20230104082956-b1c59b1b779d
+# go.openviz.dev/installer v0.0.0-20230326020900-eaec08452d0a
 ## explicit; go 1.18
 go.openviz.dev/installer/apis/installer
 go.openviz.dev/installer/apis/installer/v1alpha1
-# go.uber.org/automaxprocs v1.5.1
+# go.uber.org/automaxprocs v1.5.2
 ## explicit; go 1.18
 go.uber.org/automaxprocs
 go.uber.org/automaxprocs/internal/cgroups
 go.uber.org/automaxprocs/internal/runtime
 go.uber.org/automaxprocs/maxprocs
-# golang.org/x/net v0.7.0
+# golang.org/x/net v0.8.0
 ## explicit; go 1.17
 golang.org/x/net/context
-golang.org/x/net/context/ctxhttp
 golang.org/x/net/http/httpguts
 golang.org/x/net/http2
 golang.org/x/net/http2/hpack
 golang.org/x/net/idna
-# golang.org/x/oauth2 v0.3.0
+# golang.org/x/oauth2 v0.5.0
 ## explicit; go 1.17
 golang.org/x/oauth2
 golang.org/x/oauth2/internal
-# golang.org/x/sys v0.5.0
+# golang.org/x/sys v0.6.0
 ## explicit; go 1.17
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/plan9
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-# golang.org/x/term v0.5.0
+# golang.org/x/term v0.6.0
 ## explicit; go 1.17
 golang.org/x/term
-# golang.org/x/text v0.7.0
+# golang.org/x/text v0.8.0
 ## explicit; go 1.17
 golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
@@ -371,7 +370,7 @@ k8s.io/client-go/util/connrotation
 k8s.io/client-go/util/flowcontrol
 k8s.io/client-go/util/keyutil
 k8s.io/client-go/util/workqueue
-# k8s.io/klog/v2 v2.80.1
+# k8s.io/klog/v2 v2.90.1
 ## explicit; go 1.13
 k8s.io/klog/v2
 k8s.io/klog/v2/internal/buffer
@@ -400,20 +399,16 @@ k8s.io/utils/integer
 k8s.io/utils/internal/third_party/forked/golang/net
 k8s.io/utils/net
 k8s.io/utils/strings/slices
-# kmodules.xyz/client-go v0.25.15
+# kmodules.xyz/client-go v0.25.19
 ## explicit; go 1.18
 kmodules.xyz/client-go/api/v1
-# kmodules.xyz/objectstore-api v0.25.1-0.20221104003322-f0289b5b6ca2
+# kmodules.xyz/objectstore-api v0.25.1-0.20230326011627-dc7db1dbf318
 ## explicit; go 1.18
 kmodules.xyz/objectstore-api/api/v1
-# kubeops.dev/external-dns-operator v0.0.5-0.20230303042940-7577544216ef
+# kubeops.dev/external-dns-operator v0.0.6-0.20230326012438-3a5b47a8807f
 ## explicit; go 1.18
 kubeops.dev/external-dns-operator/apis/external
 kubeops.dev/external-dns-operator/apis/external/v1alpha1
-# kubeops.dev/installer v0.0.0-20230102190911-48de263490ae
-## explicit; go 1.18
-kubeops.dev/installer/apis/installer
-kubeops.dev/installer/apis/installer/v1alpha1
 # sigs.k8s.io/controller-runtime v0.13.1
 ## explicit; go 1.17
 sigs.k8s.io/controller-runtime/pkg/client

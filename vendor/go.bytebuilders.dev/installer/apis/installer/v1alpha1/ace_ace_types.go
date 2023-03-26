@@ -190,6 +190,8 @@ type AceGlobalValues struct {
 type AcePlatformSettings struct {
 	Domain         string         `json:"domain"`
 	DeploymentType DeploymentType `json:"deploymentType"`
+	// +optional
+	Admin AcePlatformAdmin `json:"admin"`
 }
 
 type GlobalMonitoring struct {

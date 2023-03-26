@@ -216,15 +216,26 @@ func (dt DeploymentType) Demo() bool {
 }
 
 type AceDeploymentContext struct {
-	DeploymentType     DeploymentType `json:"deploymentType"`
-	RequestedDomain    string         `json:"requestedDomain"`
-	HostedDomain       string         `json:"hostedDomain,omitempty"`
-	RequesterName      string         `json:"requesterName,omitempty"`
-	RequesterEmail     string         `json:"requesterEmail,omitempty"`
-	ProxyServiceDomain string         `json:"proxyServiceDomain,omitempty"`
-	Token              string         `json:"token,omitempty"`
-	ClusterID          string         `json:"clusterID"`
-	License            string         `json:"license,omitempty"`
+	DeploymentType       DeploymentType `json:"deploymentType"`
+	RequestedDomain      string         `json:"requestedDomain"`
+	HostedDomain         string         `json:"hostedDomain,omitempty"`
+	RequesterDisplayName string         `json:"requesterDisplayName,omitempty"`
+	RequesterUsername    string         `json:"requesterUsername,omitempty"`
+	ProxyServiceDomain   string         `json:"proxyServiceDomain,omitempty"`
+	Token                string         `json:"token,omitempty"`
+	// ClusterID is used to uniquely identify a Kubernetes cluster.
+	// To find out, run: <code>kubectl get ns kube-system -o=jsonpath='{.metadata.uid}'</code>
+	ClusterID string `json:"clusterID"`
+	License   string `json:"license,omitempty"`
+	// +optional
+	Admin AcePlatformAdmin `json:"admin"`
+}
+
+type AcePlatformAdmin struct {
+	Username    string `json:"username,omitempty"`
+	Password    string `json:"password,omitempty"`
+	Email       string `json:"email,omitempty"`
+	DisplayName string `json:"displayName,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
