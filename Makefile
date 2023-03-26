@@ -24,7 +24,7 @@ BIN      := cloudflare-dns-proxy
 COMPRESS ?= no
 
 # Where to push the docker image.
-REGISTRY ?= appscode
+REGISTRY ?= ghcr.io/appscode
 SRC_REG  ?=
 
 # This version-strategy uses git tags to set the version string
@@ -361,6 +361,7 @@ install:
 	@cd ../installer; \
 	helm upgrade -i dns-proxy charts/cloudflare-dns-proxy --wait \
 		--namespace=$(KUBE_NAMESPACE) --create-namespace \
+		--set registryFQDN="" \
 		--set image.registry=$(REGISTRY) \
 		--set image.tag=$(TAG_PROD) \
 		--set imagePullPolicy=$(IMAGE_PULL_POLICY) \
