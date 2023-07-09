@@ -17,11 +17,14 @@ limitations under the License.
 package client
 
 import (
+	"bytes"
 	"encoding/json"
+	"io"
 	"net/http"
 
 	api "go.bytebuilders.dev/installer/apis/installer/v1alpha1"
 
+	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -56,8 +59,18 @@ func GetInstallerMetadata(url, authHeader string) (*InstallerMetadata, error) {
 		return nil, err
 	}
 
+	var buf bytes.Buffer
+	_, err = io.Copy(&buf, resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.Errorf("failed to get installaer metadata, status:%d, body: %s", resp.StatusCode, buf.String())
+	}
+
 	var result InstallerMetadata
-	if err = json.NewDecoder(resp.Body).Decode(&result); err != nil {
+	if err = json.Unmarshal(buf.Bytes(), &result); err != nil {
 		return nil, err
 	}
 	return &result, nil
