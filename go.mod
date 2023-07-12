@@ -3,7 +3,7 @@ module go.bytebuilders.dev/cloudflare-dns-proxy
 go 1.18
 
 require (
-	github.com/cloudflare/cloudflare-go v0.63.0
+	github.com/cloudflare/cloudflare-go v0.72.0
 	github.com/go-chi/chi/v5 v5.0.8
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.14.0
@@ -38,7 +38,7 @@ require (
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
-	github.com/hashicorp/go-retryablehttp v0.7.2 // indirect
+	github.com/hashicorp/go-retryablehttp v0.7.4 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
@@ -59,11 +59,11 @@ require (
 	go.appscode.dev/alerts v0.2.0 // indirect
 	go.bytebuilders.dev/installer v0.1.1-0.20230530112415-d2e901bf3f81 // indirect
 	go.openviz.dev/installer v0.0.0-20230512061241-fff1e373cb67 // indirect
-	golang.org/x/net v0.9.0 // indirect
+	golang.org/x/net v0.11.0 // indirect
 	golang.org/x/oauth2 v0.7.0 // indirect
-	golang.org/x/sys v0.7.0 // indirect
-	golang.org/x/term v0.7.0 // indirect
-	golang.org/x/text v0.9.0 // indirect
+	golang.org/x/sys v0.9.0 // indirect
+	golang.org/x/term v0.9.0 // indirect
+	golang.org/x/text v0.10.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	gomodules.xyz/clock v0.0.0-20200817085942-06523dba733f // indirect
 	gomodules.xyz/flags v0.1.3 // indirect
