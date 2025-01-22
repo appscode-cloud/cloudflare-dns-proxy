@@ -18,6 +18,9 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	kmapi "kmodules.xyz/client-go/api/v1"
+	"kmodules.xyz/resource-metadata/apis/shared"
 )
 
 const (
@@ -46,47 +49,31 @@ type OpscenterFeaturesSpec struct {
 	NameOverride     string `json:"nameOverride"`
 	FullnameOverride string `json:"fullnameOverride"`
 
-	Repositories          map[string]*HelmRepository      `json:"repositories"`
-	RepositoryCredentials map[string]RepositoryCredential `json:"repositoryCredentials"`
+	// +optional
+	OfflineInstaller bool                     `json:"offlineInstaller"`
+	Image            shared.ImageRegistrySpec `json:"image"`
+	Helm             OpscenterHelmSpec        `json:"helm"`
+	Registry         shared.RegistryInfo      `json:"registry"`
+	ClusterMetadata  kmapi.ClusterInfo        `json:"clusterMetadata"`
+	LicenseServer    LicenseServerSpec        `json:"licenseServer"`
 }
 
-type HelmRepository struct {
-	// URL of the Helm repository, a valid URL contains at least a protocol and
-	// host.
-	// +required
-	URL string `json:"url"`
-
-	// SecretRef specifies the Secret containing authentication credentials
-	// for the HelmRepository.
-	// For HTTP/S basic auth the secret must contain 'username' and 'password'
-	// fields.
-	// For TLS the secret must contain a 'certFile' and 'keyFile', and/or
-	// 'caFile' fields.
-	// +optional
-	SecretName string `json:"secretName,omitempty"`
-
-	// Interval at which to check the URL for updates.
-	// +kubebuilder:validation:Type=string
-	// +kubebuilder:validation:Pattern="^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
-	// +required
-	Interval metav1.Duration `json:"interval"`
-
-	// Type of the HelmRepository.
-	// When this field is set to  "oci", the URL field value must be prefixed with "oci://".
-	// +kubebuilder:validation:Enum=default;oci
-	// +optional
-	Type string `json:"type,omitempty"`
-
-	// Provider used for authentication, can be 'aws', 'azure', 'gcp' or 'generic'.
-	// This field is optional, and only taken into account if the .spec.type field is set to 'oci'.
-	// When not specified, defaults to 'generic'.
-	// +kubebuilder:validation:Enum=generic;aws;azure;gcp
-	// +kubebuilder:default:=generic
-	// +optional
-	Provider string `json:"provider,omitempty"`
+type OpscenterHelmSpec struct {
+	CreateNamespace bool                              `json:"createNamespace"`
+	Repositories    map[string]*shared.HelmRepository `json:"repositories"`
+	Releases        map[string]*HelmRelease           `json:"releases"`
 }
 
-type RepositoryCredential map[string]string
+type HelmRelease struct {
+	Version string                `json:"version"`
+	Values  *runtime.RawExtension `json:"values,omitempty"`
+}
+
+type LicenseServerSpec struct {
+	BaseURL string `json:"baseURL"`
+	// +optional
+	Token string `json:"token"`
+}
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 

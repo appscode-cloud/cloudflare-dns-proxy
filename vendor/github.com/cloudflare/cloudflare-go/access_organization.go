@@ -2,10 +2,11 @@ package cloudflare
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/goccy/go-json"
 )
 
 // AccessOrganization represents an Access organization.
@@ -19,6 +20,10 @@ type AccessOrganization struct {
 	UIReadOnlyToggleReason         string                        `json:"ui_read_only_toggle_reason,omitempty"`
 	UserSeatExpirationInactiveTime string                        `json:"user_seat_expiration_inactive_time,omitempty"`
 	AutoRedirectToIdentity         *bool                         `json:"auto_redirect_to_identity,omitempty"`
+	SessionDuration                *string                       `json:"session_duration,omitempty"`
+	CustomPages                    AccessOrganizationCustomPages `json:"custom_pages,omitempty"`
+	WarpAuthSessionDuration        *string                       `json:"warp_auth_session_duration,omitempty"`
+	AllowAuthenticateViaWarp       *bool                         `json:"allow_authenticate_via_warp,omitempty"`
 }
 
 // AccessOrganizationLoginDesign represents the login design options.
@@ -28,6 +33,11 @@ type AccessOrganizationLoginDesign struct {
 	TextColor       string `json:"text_color"`
 	HeaderText      string `json:"header_text"`
 	FooterText      string `json:"footer_text"`
+}
+
+type AccessOrganizationCustomPages struct {
+	Forbidden      AccessCustomPageType `json:"forbidden,omitempty"`
+	IdentityDenied AccessCustomPageType `json:"identity_denied,omitempty"`
 }
 
 // AccessOrganizationListResponse represents the response from the list
@@ -57,6 +67,10 @@ type CreateAccessOrganizationParams struct {
 	UIReadOnlyToggleReason         string                        `json:"ui_read_only_toggle_reason,omitempty"`
 	UserSeatExpirationInactiveTime string                        `json:"user_seat_expiration_inactive_time,omitempty"`
 	AutoRedirectToIdentity         *bool                         `json:"auto_redirect_to_identity,omitempty"`
+	SessionDuration                *string                       `json:"session_duration,omitempty"`
+	CustomPages                    AccessOrganizationCustomPages `json:"custom_pages,omitempty"`
+	WarpAuthSessionDuration        *string                       `json:"warp_auth_session_duration,omitempty"`
+	AllowAuthenticateViaWarp       *bool                         `json:"allow_authenticate_via_warp,omitempty"`
 }
 
 type UpdateAccessOrganizationParams struct {
@@ -67,6 +81,10 @@ type UpdateAccessOrganizationParams struct {
 	UIReadOnlyToggleReason         string                        `json:"ui_read_only_toggle_reason,omitempty"`
 	UserSeatExpirationInactiveTime string                        `json:"user_seat_expiration_inactive_time,omitempty"`
 	AutoRedirectToIdentity         *bool                         `json:"auto_redirect_to_identity,omitempty"`
+	SessionDuration                *string                       `json:"session_duration,omitempty"`
+	CustomPages                    AccessOrganizationCustomPages `json:"custom_pages,omitempty"`
+	WarpAuthSessionDuration        *string                       `json:"warp_auth_session_duration,omitempty"`
+	AllowAuthenticateViaWarp       *bool                         `json:"allow_authenticate_via_warp,omitempty"`
 }
 
 func (api *API) GetAccessOrganization(ctx context.Context, rc *ResourceContainer, params GetAccessOrganizationParams) (AccessOrganization, ResultInfo, error) {

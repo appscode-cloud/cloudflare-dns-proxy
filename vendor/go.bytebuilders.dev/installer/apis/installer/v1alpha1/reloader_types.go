@@ -18,7 +18,9 @@ package v1alpha1
 
 import (
 	core "k8s.io/api/core/v1"
+	networking "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	vpa "k8s.io/autoscaler/vertical-pod-autoscaler/pkg/apis/autoscaling.k8s.io/v1"
 )
 
 const (
@@ -62,6 +64,7 @@ type ReloaderKubernetes struct {
 }
 
 type ReloaderDetails struct {
+	AutoReloadAll          bool                        `json:"autoReloadAll"`
 	IsArgoRollouts         bool                        `json:"isArgoRollouts"`
 	IsOpenshift            bool                        `json:"isOpenshift"`
 	IgnoreSecrets          bool                        `json:"ignoreSecrets"`
@@ -72,6 +75,7 @@ type ReloaderDetails struct {
 	ReloadStrategy         string                      `json:"reloadStrategy"`
 	IgnoreNamespaces       string                      `json:"ignoreNamespaces"`
 	NamespaceSelector      string                      `json:"namespaceSelector"`
+	ResourceLabelSelector  string                      `json:"resourceLabelSelector"`
 	LogFormat              string                      `json:"logFormat"`
 	WatchGlobally          bool                        `json:"watchGlobally"`
 	ReadOnlyRootFileSystem bool                        `json:"readOnlyRootFileSystem"`
@@ -85,6 +89,14 @@ type ReloaderDetails struct {
 	ServiceMonitor         ReloaderServiceMonitorSpec  `json:"serviceMonitor"`
 	PodMonitor             ReloaderPodMonitorSpec      `json:"podMonitor"`
 	PodDisruptionBudget    ReloaderPodDisruptionBudget `json:"podDisruptionBudget"`
+	Netpol                 ReloaderNetpol              `json:"netpol"`
+	// +optional
+	VerticalPodAutoscaler ReloaderVerticalPodAutoscaler `json:"verticalPodAutoscaler"`
+	// +optional
+	VolumeMounts []core.VolumeMount `json:"volumeMounts"`
+	// +optional
+	Volumes    []core.Volume `json:"volumes"`
+	WebhookUrl string        `json:"webhookUrl"`
 }
 
 type ReloaderLegacy struct {
@@ -96,6 +108,7 @@ type ReloaderDeploymentSpec struct {
 	//+optional
 	NodeSelector             map[string]string         `json:"nodeSelector"`
 	Affinity                 *core.Affinity            `json:"affinity"`
+	RevisionHistoryLimit     int                       `json:"revisionHistoryLimit"`
 	SecurityContext          *core.PodSecurityContext  `json:"securityContext"`
 	ContainerSecurityContext *core.SecurityContext     `json:"containerSecurityContext"`
 	Tolerations              []core.Toleration         `json:"tolerations"`
@@ -108,6 +121,40 @@ type ReloaderDeploymentSpec struct {
 	Resources                core.ResourceRequirements `json:"resources"`
 	Pod                      ReloaderPodSpec           `json:"pod"`
 	PriorityClassName        string                    `json:"priorityClassName"`
+	// TopologySpreadConstraints describes how a group of pods ought to spread across topology
+	// domains. Scheduler will schedule pods in a way which abides by the constraints.
+	// All topologySpreadConstraints are ANDed.
+	// +optional
+	// +patchMergeKey=topologyKey
+	// +patchStrategy=merge
+	// +listType=map
+	// +listMapKey=topologyKey
+	// +listMapKey=whenUnsatisfiable
+	TopologySpreadConstraints []core.TopologySpreadConstraint `json:"topologySpreadConstraints" patchStrategy:"merge" patchMergeKey:"topologyKey"`
+}
+
+type ReloaderVerticalPodAutoscaler struct {
+	Enabled bool `json:"enabled"`
+	// Recommender responsible for generating recommendation for this object.
+	// List should be empty (then the default recommender will generate the
+	// recommendation) or contain exactly one recommender.
+	// +optional
+	Recommenders []*vpa.VerticalPodAutoscalerRecommenderSelector `json:"recommenders,omitempty"`
+	// Specifies the type of recommendations that will be computed
+	// (and possibly applied) by VPA.
+	// If not specified, the default of [ResourceCPU, ResourceMemory] will be used.
+	ControlledResources *[]core.ResourceName `json:"controlledResources,omitempty" patchStrategy:"merge"`
+	// Specifies which resource values should be controlled.
+	// The default is "RequestsAndLimits".
+	// +optional
+	ControlledValues *vpa.ContainerControlledValues `json:"controlledValues,omitempty"`
+	MaxAllowed       core.ResourceList              `json:"maxAllowed"`
+	MinAllowed       core.ResourceList              `json:"minAllowed"`
+	// Describes the rules on how changes are applied to the pods.
+	// If not specified, all fields in the `PodUpdatePolicy` are set to their
+	// default values.
+	// +optional
+	UpdatePolicy *vpa.PodUpdatePolicy `json:"updatePolicy,omitempty"`
 }
 
 type ReloaderLabels struct {
@@ -181,6 +228,14 @@ type ReloaderPodMonitorSpec struct {
 
 type ReloaderPodDisruptionBudget struct {
 	Enabled bool `json:"enabled"`
+}
+
+type ReloaderNetpol struct {
+	Enabled bool `json:"enabled"`
+	// +optional
+	From []networking.NetworkPolicyPeer `json:"from"`
+	// +optional
+	To []networking.NetworkPolicyPeer `json:"to"`
 }
 
 // EnvVar represents an environment variable present in a Container.

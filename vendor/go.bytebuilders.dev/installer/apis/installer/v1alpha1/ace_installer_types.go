@@ -17,8 +17,11 @@ limitations under the License.
 package v1alpha1
 
 import (
+	configapi "go.bytebuilders.dev/resource-model/apis/config/v1alpha1"
+
+	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
+	"kmodules.xyz/resource-metadata/apis/shared"
 )
 
 const (
@@ -47,15 +50,26 @@ type AceInstallerSpec struct {
 	NameOverride     string `json:"nameOverride"`
 	FullnameOverride string `json:"fullnameOverride"`
 
-	Repositories          map[string]*HelmRepository      `json:"repositories"`
-	RepositoryCredentials map[string]RepositoryCredential `json:"repositoryCredentials"`
-	Releases              map[string]*HelmRelease         `json:"releases"`
+	// +optional
+	DeploymentType DeploymentType `json:"deploymentType"`
+	// +optional
+	InstallerVersion        string `json:"installerVersion"`
+	shared.BootstrapPresets `json:",inline,omitempty"`
+	SelfManagement          configapi.SelfManagement `json:"selfManagement"`
+	Precheck                AceInstallerPrecheckSpec `json:"precheck"`
 }
 
-type HelmRelease struct {
-	Enabled bool                  `json:"enabled"`
-	Version string                `json:"version"`
-	Values  *runtime.RawExtension `json:"values,omitempty"`
+type AceInstallerPrecheckSpec struct {
+	Enabled            bool                      `json:"enabled"`
+	Image              ImageReference            `json:"image"`
+	PodAnnotations     map[string]string         `json:"podAnnotations"`
+	PodSecurityContext *core.PodSecurityContext  `json:"podSecurityContext"`
+	SecurityContext    *core.SecurityContext     `json:"securityContext"`
+	Resources          core.ResourceRequirements `json:"resources"`
+	//+optional
+	NodeSelector map[string]string `json:"nodeSelector"`
+	Tolerations  []core.Toleration `json:"tolerations"`
+	Affinity     *core.Affinity    `json:"affinity"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

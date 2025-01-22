@@ -52,7 +52,7 @@ type NatsSpec struct {
 	NameOverride              string                          `json:"nameOverride"`
 	NamespaceOverride         string                          `json:"namespaceOverride"`
 	ImagePullSecrets          []string                        `json:"imagePullSecrets"`
-	SecurityContext           *core.SecurityContext           `json:"securityContext"`
+	SecurityContext           *core.PodSecurityContext        `json:"securityContext"`
 	Affinity                  *core.Affinity                  `json:"affinity"`
 	PriorityClassName         *string                         `json:"priorityClassName"`
 	TopologyKeys              []string                        `json:"topologyKeys"`
@@ -277,19 +277,24 @@ type NatsImageRef struct {
 }
 
 type NatsBootconfigSpec struct {
-	Image           NatsImageRef          `json:"image"`
-	SecurityContext *core.SecurityContext `json:"securityContext"`
+	Image NatsImageRef `json:"image"`
+	//+optional
+	Resources       core.ResourceRequirements `json:"resources"`
+	SecurityContext *core.SecurityContext     `json:"securityContext"`
 }
 
 type NatsboxSpec struct {
-	Enabled          bool                  `json:"enabled"`
-	Image            NatsImageRef          `json:"image"`
-	SecurityContext  *core.SecurityContext `json:"securityContext"`
-	AdditionalLabels map[string]string     `json:"additionalLabels"`
-	ImagePullSecrets []string              `json:"imagePullSecrets"`
-	PodAnnotations   map[string]string     `json:"podAnnotations"`
-	PodLabels        map[string]string     `json:"podLabels"`
-	Affinity         *core.Affinity        `json:"affinity"`
+	Enabled bool         `json:"enabled"`
+	Image   NatsImageRef `json:"image"`
+	//+optional
+	Resources        core.ResourceRequirements `json:"resources"`
+	Annotations      map[string]string         `json:"annotations"`
+	SecurityContext  *core.SecurityContext     `json:"securityContext"`
+	AdditionalLabels map[string]string         `json:"additionalLabels"`
+	ImagePullSecrets []string                  `json:"imagePullSecrets"`
+	PodAnnotations   map[string]string         `json:"podAnnotations"`
+	PodLabels        map[string]string         `json:"podLabels"`
+	Affinity         *core.Affinity            `json:"affinity"`
 	//+optional
 	NodeSelector      map[string]string  `json:"nodeSelector"`
 	Tolerations       []core.Toleration  `json:"tolerations"`
@@ -298,10 +303,11 @@ type NatsboxSpec struct {
 }
 
 type NatsReloaderSpec struct {
-	Enabled         bool                  `json:"enabled"`
-	Image           NatsImageRef          `json:"image"`
-	SecurityContext *core.SecurityContext `json:"securityContext"`
-	ExtraConfigs    []string              `json:"extraConfigs"`
+	Enabled         bool                      `json:"enabled"`
+	Image           NatsImageRef              `json:"image"`
+	Resources       core.ResourceRequirements `json:"resources"`
+	SecurityContext *core.SecurityContext     `json:"securityContext"`
+	ExtraConfigs    []string                  `json:"extraConfigs"`
 }
 
 type NatsExporterSpec struct {
@@ -332,10 +338,10 @@ type NatsAuthSpec struct {
 }
 
 type NatsOperatorJWTSpec struct {
-	ConfigMap ConfigMapKeySelector `json:"configMap"`
+	ConfigMap ConfigKeySelector `json:"configMap"`
 }
 
-type ConfigMapKeySelector struct {
+type ConfigKeySelector struct {
 	Name string `json:"name"`
 	Key  string `json:"key"`
 }

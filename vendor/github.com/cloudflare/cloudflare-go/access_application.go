@@ -2,10 +2,11 @@ package cloudflare
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/goccy/go-json"
 )
 
 // AccessApplicationType represents the application type.
@@ -25,31 +26,36 @@ const (
 
 // AccessApplication represents an Access application.
 type AccessApplication struct {
-	GatewayRules            []AccessApplicationGatewayRule `json:"gateway_rules,omitempty"`
-	AllowedIdps             []string                       `json:"allowed_idps,omitempty"`
-	CustomDenyMessage       string                         `json:"custom_deny_message,omitempty"`
-	LogoURL                 string                         `json:"logo_url,omitempty"`
-	AUD                     string                         `json:"aud,omitempty"`
-	Domain                  string                         `json:"domain"`
-	SelfHostedDomains       []string                       `json:"self_hosted_domains"`
-	Type                    AccessApplicationType          `json:"type,omitempty"`
-	SessionDuration         string                         `json:"session_duration,omitempty"`
-	SameSiteCookieAttribute string                         `json:"same_site_cookie_attribute,omitempty"`
-	CustomDenyURL           string                         `json:"custom_deny_url,omitempty"`
-	Name                    string                         `json:"name"`
-	ID                      string                         `json:"id,omitempty"`
-	PrivateAddress          string                         `json:"private_address"`
-	CorsHeaders             *AccessApplicationCorsHeaders  `json:"cors_headers,omitempty"`
-	CreatedAt               *time.Time                     `json:"created_at,omitempty"`
-	UpdatedAt               *time.Time                     `json:"updated_at,omitempty"`
-	SaasApplication         *SaasApplication               `json:"saas_app,omitempty"`
-	AutoRedirectToIdentity  *bool                          `json:"auto_redirect_to_identity,omitempty"`
-	SkipInterstitial        *bool                          `json:"skip_interstitial,omitempty"`
-	AppLauncherVisible      *bool                          `json:"app_launcher_visible,omitempty"`
-	EnableBindingCookie     *bool                          `json:"enable_binding_cookie,omitempty"`
-	HttpOnlyCookieAttribute *bool                          `json:"http_only_cookie_attribute,omitempty"`
-	ServiceAuth401Redirect  *bool                          `json:"service_auth_401_redirect,omitempty"`
-	PathCookieAttribute     *bool                          `json:"path_cookie_attribute,omitempty"`
+	GatewayRules             []AccessApplicationGatewayRule `json:"gateway_rules,omitempty"`
+	AllowedIdps              []string                       `json:"allowed_idps,omitempty"`
+	CustomDenyMessage        string                         `json:"custom_deny_message,omitempty"`
+	LogoURL                  string                         `json:"logo_url,omitempty"`
+	AUD                      string                         `json:"aud,omitempty"`
+	Domain                   string                         `json:"domain"`
+	SelfHostedDomains        []string                       `json:"self_hosted_domains"`
+	Type                     AccessApplicationType          `json:"type,omitempty"`
+	SessionDuration          string                         `json:"session_duration,omitempty"`
+	SameSiteCookieAttribute  string                         `json:"same_site_cookie_attribute,omitempty"`
+	CustomDenyURL            string                         `json:"custom_deny_url,omitempty"`
+	CustomNonIdentityDenyURL string                         `json:"custom_non_identity_deny_url,omitempty"`
+	Name                     string                         `json:"name"`
+	ID                       string                         `json:"id,omitempty"`
+	PrivateAddress           string                         `json:"private_address"`
+	CorsHeaders              *AccessApplicationCorsHeaders  `json:"cors_headers,omitempty"`
+	CreatedAt                *time.Time                     `json:"created_at,omitempty"`
+	UpdatedAt                *time.Time                     `json:"updated_at,omitempty"`
+	SaasApplication          *SaasApplication               `json:"saas_app,omitempty"`
+	AutoRedirectToIdentity   *bool                          `json:"auto_redirect_to_identity,omitempty"`
+	SkipInterstitial         *bool                          `json:"skip_interstitial,omitempty"`
+	AppLauncherVisible       *bool                          `json:"app_launcher_visible,omitempty"`
+	EnableBindingCookie      *bool                          `json:"enable_binding_cookie,omitempty"`
+	HttpOnlyCookieAttribute  *bool                          `json:"http_only_cookie_attribute,omitempty"`
+	ServiceAuth401Redirect   *bool                          `json:"service_auth_401_redirect,omitempty"`
+	PathCookieAttribute      *bool                          `json:"path_cookie_attribute,omitempty"`
+	AllowAuthenticateViaWarp *bool                          `json:"allow_authenticate_via_warp,omitempty"`
+	CustomPages              []string                       `json:"custom_pages,omitempty"`
+	Tags                     []string                       `json:"tags,omitempty"`
+	AccessAppLauncherCustomization
 }
 
 type AccessApplicationGatewayRule struct {
@@ -100,71 +106,117 @@ type SAMLAttributeConfig struct {
 }
 
 type SaasApplication struct {
-	AppID              string                `json:"app_id,omitempty"`
-	ConsumerServiceUrl string                `json:"consumer_service_url,omitempty"`
-	SPEntityID         string                `json:"sp_entity_id,omitempty"`
-	PublicKey          string                `json:"public_key,omitempty"`
-	IDPEntityID        string                `json:"idp_entity_id,omitempty"`
-	NameIDFormat       string                `json:"name_id_format,omitempty"`
-	SSOEndpoint        string                `json:"sso_endpoint,omitempty"`
-	UpdatedAt          *time.Time            `json:"updated_at,omitempty"`
-	CreatedAt          *time.Time            `json:"created_at,omitempty"`
-	CustomAttributes   []SAMLAttributeConfig `json:"custom_attributes,omitempty"`
+	// Items common to both SAML and OIDC
+	AppID     string     `json:"app_id,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	PublicKey string     `json:"public_key,omitempty"`
+	AuthType  string     `json:"auth_type,omitempty"`
+
+	// SAML saas app
+	ConsumerServiceUrl            string                `json:"consumer_service_url,omitempty"`
+	SPEntityID                    string                `json:"sp_entity_id,omitempty"`
+	IDPEntityID                   string                `json:"idp_entity_id,omitempty"`
+	NameIDFormat                  string                `json:"name_id_format,omitempty"`
+	SSOEndpoint                   string                `json:"sso_endpoint,omitempty"`
+	DefaultRelayState             string                `json:"default_relay_state,omitempty"`
+	CustomAttributes              []SAMLAttributeConfig `json:"custom_attributes,omitempty"`
+	NameIDTransformJsonata        string                `json:"name_id_transform_jsonata,omitempty"`
+	SamlAttributeTransformJsonata string                `json:"saml_attribute_transform_jsonata"`
+
+	// OIDC saas app
+	ClientID         string   `json:"client_id,omitempty"`
+	ClientSecret     string   `json:"client_secret,omitempty"`
+	RedirectURIs     []string `json:"redirect_uris,omitempty"`
+	GrantTypes       []string `json:"grant_types,omitempty"`
+	Scopes           []string `json:"scopes,omitempty"`
+	AppLauncherURL   string   `json:"app_launcher_url,omitempty"`
+	GroupFilterRegex string   `json:"group_filter_regex,omitempty"`
 }
 
+type AccessAppLauncherCustomization struct {
+	LandingPageDesign     AccessLandingPageDesign `json:"landing_page_design"`
+	LogoURL               string                  `json:"app_launcher_logo_url"`
+	HeaderBackgroundColor string                  `json:"header_bg_color"`
+	BackgroundColor       string                  `json:"bg_color"`
+	FooterLinks           []AccessFooterLink      `json:"footer_links"`
+}
+
+type AccessFooterLink struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
+}
+
+type AccessLandingPageDesign struct {
+	Title           string `json:"title"`
+	Message         string `json:"message"`
+	ImageURL        string `json:"image_url"`
+	ButtonColor     string `json:"button_color"`
+	ButtonTextColor string `json:"button_text_color"`
+}
 type ListAccessApplicationsParams struct {
 	ResultInfo
 }
 
 type CreateAccessApplicationParams struct {
-	AllowedIdps             []string                       `json:"allowed_idps,omitempty"`
-	AppLauncherVisible      *bool                          `json:"app_launcher_visible,omitempty"`
-	AUD                     string                         `json:"aud,omitempty"`
-	AutoRedirectToIdentity  *bool                          `json:"auto_redirect_to_identity,omitempty"`
-	CorsHeaders             *AccessApplicationCorsHeaders  `json:"cors_headers,omitempty"`
-	CustomDenyMessage       string                         `json:"custom_deny_message,omitempty"`
-	CustomDenyURL           string                         `json:"custom_deny_url,omitempty"`
-	Domain                  string                         `json:"domain"`
-	EnableBindingCookie     *bool                          `json:"enable_binding_cookie,omitempty"`
-	GatewayRules            []AccessApplicationGatewayRule `json:"gateway_rules,omitempty"`
-	HttpOnlyCookieAttribute *bool                          `json:"http_only_cookie_attribute,omitempty"`
-	LogoURL                 string                         `json:"logo_url,omitempty"`
-	Name                    string                         `json:"name"`
-	PathCookieAttribute     *bool                          `json:"path_cookie_attribute,omitempty"`
-	PrivateAddress          string                         `json:"private_address"`
-	SaasApplication         *SaasApplication               `json:"saas_app,omitempty"`
-	SameSiteCookieAttribute string                         `json:"same_site_cookie_attribute,omitempty"`
-	SelfHostedDomains       []string                       `json:"self_hosted_domains"`
-	ServiceAuth401Redirect  *bool                          `json:"service_auth_401_redirect,omitempty"`
-	SessionDuration         string                         `json:"session_duration,omitempty"`
-	SkipInterstitial        *bool                          `json:"skip_interstitial,omitempty"`
-	Type                    AccessApplicationType          `json:"type,omitempty"`
+	AllowedIdps              []string                       `json:"allowed_idps,omitempty"`
+	AppLauncherVisible       *bool                          `json:"app_launcher_visible,omitempty"`
+	AUD                      string                         `json:"aud,omitempty"`
+	AutoRedirectToIdentity   *bool                          `json:"auto_redirect_to_identity,omitempty"`
+	CorsHeaders              *AccessApplicationCorsHeaders  `json:"cors_headers,omitempty"`
+	CustomDenyMessage        string                         `json:"custom_deny_message,omitempty"`
+	CustomDenyURL            string                         `json:"custom_deny_url,omitempty"`
+	CustomNonIdentityDenyURL string                         `json:"custom_non_identity_deny_url,omitempty"`
+	Domain                   string                         `json:"domain"`
+	EnableBindingCookie      *bool                          `json:"enable_binding_cookie,omitempty"`
+	GatewayRules             []AccessApplicationGatewayRule `json:"gateway_rules,omitempty"`
+	HttpOnlyCookieAttribute  *bool                          `json:"http_only_cookie_attribute,omitempty"`
+	LogoURL                  string                         `json:"logo_url,omitempty"`
+	Name                     string                         `json:"name"`
+	PathCookieAttribute      *bool                          `json:"path_cookie_attribute,omitempty"`
+	PrivateAddress           string                         `json:"private_address"`
+	SaasApplication          *SaasApplication               `json:"saas_app,omitempty"`
+	SameSiteCookieAttribute  string                         `json:"same_site_cookie_attribute,omitempty"`
+	SelfHostedDomains        []string                       `json:"self_hosted_domains"`
+	ServiceAuth401Redirect   *bool                          `json:"service_auth_401_redirect,omitempty"`
+	SessionDuration          string                         `json:"session_duration,omitempty"`
+	SkipInterstitial         *bool                          `json:"skip_interstitial,omitempty"`
+	Type                     AccessApplicationType          `json:"type,omitempty"`
+	AllowAuthenticateViaWarp *bool                          `json:"allow_authenticate_via_warp,omitempty"`
+	CustomPages              []string                       `json:"custom_pages,omitempty"`
+	Tags                     []string                       `json:"tags,omitempty"`
+	AccessAppLauncherCustomization
 }
 
 type UpdateAccessApplicationParams struct {
-	ID                      string                         `json:"id,omitempty"`
-	AllowedIdps             []string                       `json:"allowed_idps,omitempty"`
-	AppLauncherVisible      *bool                          `json:"app_launcher_visible,omitempty"`
-	AUD                     string                         `json:"aud,omitempty"`
-	AutoRedirectToIdentity  *bool                          `json:"auto_redirect_to_identity,omitempty"`
-	CorsHeaders             *AccessApplicationCorsHeaders  `json:"cors_headers,omitempty"`
-	CustomDenyMessage       string                         `json:"custom_deny_message,omitempty"`
-	CustomDenyURL           string                         `json:"custom_deny_url,omitempty"`
-	Domain                  string                         `json:"domain"`
-	EnableBindingCookie     *bool                          `json:"enable_binding_cookie,omitempty"`
-	GatewayRules            []AccessApplicationGatewayRule `json:"gateway_rules,omitempty"`
-	HttpOnlyCookieAttribute *bool                          `json:"http_only_cookie_attribute,omitempty"`
-	LogoURL                 string                         `json:"logo_url,omitempty"`
-	Name                    string                         `json:"name"`
-	PathCookieAttribute     *bool                          `json:"path_cookie_attribute,omitempty"`
-	PrivateAddress          string                         `json:"private_address"`
-	SaasApplication         *SaasApplication               `json:"saas_app,omitempty"`
-	SameSiteCookieAttribute string                         `json:"same_site_cookie_attribute,omitempty"`
-	SelfHostedDomains       []string                       `json:"self_hosted_domains"`
-	ServiceAuth401Redirect  *bool                          `json:"service_auth_401_redirect,omitempty"`
-	SessionDuration         string                         `json:"session_duration,omitempty"`
-	SkipInterstitial        *bool                          `json:"skip_interstitial,omitempty"`
-	Type                    AccessApplicationType          `json:"type,omitempty"`
+	ID                       string                         `json:"id,omitempty"`
+	AllowedIdps              []string                       `json:"allowed_idps,omitempty"`
+	AppLauncherVisible       *bool                          `json:"app_launcher_visible,omitempty"`
+	AUD                      string                         `json:"aud,omitempty"`
+	AutoRedirectToIdentity   *bool                          `json:"auto_redirect_to_identity,omitempty"`
+	CorsHeaders              *AccessApplicationCorsHeaders  `json:"cors_headers,omitempty"`
+	CustomDenyMessage        string                         `json:"custom_deny_message,omitempty"`
+	CustomDenyURL            string                         `json:"custom_deny_url,omitempty"`
+	CustomNonIdentityDenyURL string                         `json:"custom_non_identity_deny_url,omitempty"`
+	Domain                   string                         `json:"domain"`
+	EnableBindingCookie      *bool                          `json:"enable_binding_cookie,omitempty"`
+	GatewayRules             []AccessApplicationGatewayRule `json:"gateway_rules,omitempty"`
+	HttpOnlyCookieAttribute  *bool                          `json:"http_only_cookie_attribute,omitempty"`
+	LogoURL                  string                         `json:"logo_url,omitempty"`
+	Name                     string                         `json:"name"`
+	PathCookieAttribute      *bool                          `json:"path_cookie_attribute,omitempty"`
+	PrivateAddress           string                         `json:"private_address"`
+	SaasApplication          *SaasApplication               `json:"saas_app,omitempty"`
+	SameSiteCookieAttribute  string                         `json:"same_site_cookie_attribute,omitempty"`
+	SelfHostedDomains        []string                       `json:"self_hosted_domains"`
+	ServiceAuth401Redirect   *bool                          `json:"service_auth_401_redirect,omitempty"`
+	SessionDuration          string                         `json:"session_duration,omitempty"`
+	SkipInterstitial         *bool                          `json:"skip_interstitial,omitempty"`
+	Type                     AccessApplicationType          `json:"type,omitempty"`
+	AllowAuthenticateViaWarp *bool                          `json:"allow_authenticate_via_warp,omitempty"`
+	CustomPages              []string                       `json:"custom_pages,omitempty"`
+	Tags                     []string                       `json:"tags,omitempty"`
+	AccessAppLauncherCustomization
 }
 
 // ListAccessApplications returns all applications within an account or zone.
@@ -204,7 +256,7 @@ func (api *API) ListAccessApplications(ctx context.Context, rc *ResourceContaine
 		}
 		applications = append(applications, r.Result...)
 		params.ResultInfo = r.ResultInfo.Next()
-		if params.ResultInfo.Done() || autoPaginate {
+		if params.ResultInfo.Done() || !autoPaginate {
 			break
 		}
 	}

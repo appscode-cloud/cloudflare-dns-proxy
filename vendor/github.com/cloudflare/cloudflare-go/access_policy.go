@@ -2,11 +2,12 @@ package cloudflare
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/goccy/go-json"
 )
 
 var (
@@ -30,6 +31,7 @@ type AccessPolicy struct {
 	Name       string     `json:"name"`
 
 	IsolationRequired            *bool                 `json:"isolation_required,omitempty"`
+	SessionDuration              *string               `json:"session_duration,omitempty"`
 	PurposeJustificationRequired *bool                 `json:"purpose_justification_required,omitempty"`
 	PurposeJustificationPrompt   *string               `json:"purpose_justification_prompt,omitempty"`
 	ApprovalRequired             *bool                 `json:"approval_required,omitempty"`
@@ -83,6 +85,7 @@ type CreateAccessPolicyParams struct {
 	Name       string `json:"name"`
 
 	IsolationRequired            *bool                 `json:"isolation_required,omitempty"`
+	SessionDuration              *string               `json:"session_duration,omitempty"`
 	PurposeJustificationRequired *bool                 `json:"purpose_justification_required,omitempty"`
 	PurposeJustificationPrompt   *string               `json:"purpose_justification_prompt,omitempty"`
 	ApprovalRequired             *bool                 `json:"approval_required,omitempty"`
@@ -110,6 +113,7 @@ type UpdateAccessPolicyParams struct {
 	Name       string `json:"name"`
 
 	IsolationRequired            *bool                 `json:"isolation_required,omitempty"`
+	SessionDuration              *string               `json:"session_duration,omitempty"`
 	PurposeJustificationRequired *bool                 `json:"purpose_justification_required,omitempty"`
 	PurposeJustificationPrompt   *string               `json:"purpose_justification_prompt,omitempty"`
 	ApprovalRequired             *bool                 `json:"approval_required,omitempty"`
@@ -177,7 +181,7 @@ func (api *API) ListAccessPolicies(ctx context.Context, rc *ResourceContainer, p
 		}
 		accessPolicies = append(accessPolicies, r.Result...)
 		params.ResultInfo = r.ResultInfo.Next()
-		if params.ResultInfo.Done() || autoPaginate {
+		if params.ResultInfo.Done() || !autoPaginate {
 			break
 		}
 	}

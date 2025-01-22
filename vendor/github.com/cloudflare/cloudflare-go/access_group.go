@@ -2,10 +2,11 @@ package cloudflare
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/goccy/go-json"
 )
 
 // AccessGroup defines a group for allowing or disallowing access to
@@ -36,6 +37,15 @@ type AccessGroupEmail struct {
 	Email struct {
 		Email string `json:"email"`
 	} `json:"email"`
+}
+
+// AccessGroupEmailList is used for managing access based on the email
+// list. For example, restrict access to users with the email addresses
+// in the email list with the ID `1234567890abcdef1234567890abcdef`.
+type AccessGroupEmailList struct {
+	EmailList struct {
+		ID string `json:"id"`
+	} `json:"email_list"`
 }
 
 // AccessGroupEmailDomain is used for managing access based on an email
@@ -151,6 +161,15 @@ type AccessGroupSAML struct {
 		AttributeValue     string `json:"attribute_value"`
 		IdentityProviderID string `json:"identity_provider_id"`
 	} `json:"saml"`
+}
+
+// AccessGroupAzureAuthContext is used to configure access based on Azure auth contexts.
+type AccessGroupAzureAuthContext struct {
+	AuthContext struct {
+		ID                 string `json:"id"`
+		IdentityProviderID string `json:"identity_provider_id"`
+		ACID               string `json:"ac_id"`
+	} `json:"auth_context"`
 }
 
 // AccessGroupAuthMethod is used for managing access by the "amr"
@@ -276,7 +295,7 @@ func (api *API) ListAccessGroups(ctx context.Context, rc *ResourceContainer, par
 		}
 		accessGroups = append(accessGroups, r.Result...)
 		params.ResultInfo = r.ResultInfo.Next()
-		if params.ResultInfo.Done() || autoPaginate {
+		if params.ResultInfo.Done() || !autoPaginate {
 			break
 		}
 	}

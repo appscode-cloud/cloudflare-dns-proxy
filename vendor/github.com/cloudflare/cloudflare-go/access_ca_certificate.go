@@ -2,9 +2,10 @@ package cloudflare
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/goccy/go-json"
 )
 
 // AccessCACertificate is the structure of the CA certificate used for
@@ -74,7 +75,7 @@ func (api *API) ListAccessCACertificates(ctx context.Context, rc *ResourceContai
 		}
 		accessCACertificates = append(accessCACertificates, r.Result...)
 		params.ResultInfo = r.ResultInfo.Next()
-		if params.ResultInfo.Done() || autoPaginate {
+		if params.ResultInfo.Done() || !autoPaginate {
 			break
 		}
 	}

@@ -22,6 +22,7 @@ import (
 	"io"
 	"net/http"
 
+	catgwapi "go.bytebuilders.dev/catalog/api/gateway/v1alpha1"
 	api "go.bytebuilders.dev/installer/apis/installer/v1alpha1"
 
 	"github.com/pkg/errors"
@@ -31,8 +32,11 @@ import (
 type InstallerMetadata struct {
 	ID string `json:"ID"`
 
+	InstallerName        string             `json:"installerName"`
 	DeploymentType       api.DeploymentType `json:"deploymentType"`
 	RequestedDomain      string             `json:"requestedDomain"`
+	Host                 string             `json:"host,omitempty"`
+	HostType             catgwapi.HostType  `json:"hostType,omitempty"`
 	HostedDomain         string             `json:"hostedDomain,omitempty"`
 	OwnerID              int64              `json:"-"`
 	OwnerName            string             `json:"ownerName"`
@@ -41,10 +45,17 @@ type InstallerMetadata struct {
 	RequesterUsername    string             `json:"requesterUsername,omitempty"`
 	AdminDisplayName     string             `json:"adminDisplayName"`
 	AdminEmail           string             `json:"adminEmail"`
+	AccessTokenID        int64              `json:"accessTokenID"`
 	ClusterID            string             `json:"clusterID"`
+	Version              string             `json:"version"`
+
+	PromotedToProduction bool `json:"promotedToProduction"`
 
 	CreateTimestamp metav1.Time `json:"createTimestamp"`
 	ExpiryTimestamp metav1.Time `json:"expiryTimestamp,omitempty"`
+
+	LastUpgradeTimestamp metav1.Time `json:"lastUpgradeTimestamp,omitempty"`
+	LastUpdateTimestamp  metav1.Time `json:"lastUpdateTimestamp,omitempty"`
 }
 
 func GetInstallerMetadata(url, authHeader string) (*InstallerMetadata, error) {

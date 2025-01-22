@@ -44,13 +44,34 @@ type IngressNginx struct {
 
 // IngressNginxSpec is the schema for IngressNginx Operator values file
 type IngressNginxSpec struct {
-	Controller IngressNginxController `json:"controller"`
+	//+optional
+	NameOverride string `json:"nameOverride"`
+	//+optional
+	FullnameOverride string                 `json:"fullnameOverride"`
+	Controller       IngressNginxController `json:"controller"`
 	// +optional
 	TCP map[string]string `json:"tcp,omitempty"`
+	// +optional
+	DefaultBackend IngressNginxDefaultBackend `json:"defaultBackend"`
+}
+
+type IngressNginxDefaultBackend struct {
+	Enabled bool                            `json:"enabled"`
+	Name    string                          `json:"name"`
+	Image   IngressNginxDefaultBackendImage `json:"image"`
+}
+
+type IngressNginxDefaultBackendImage struct {
+	Registry string `json:"registry"`
+	Image    string `json:"image"`
+	Tag      string `json:"tag"`
 }
 
 type IngressNginxController struct {
+	//+optional
+	Name                 string                                     `json:"name"`
 	Image                IngressNginxControllerImage                `json:"image"`
+	Config               map[string]string                          `json:"config"`
 	HostPort             *IngressNginxControllerHostPort            `json:"hostPort,omitempty"`
 	IngressClassByName   bool                                       `json:"ingressClassByName"`
 	IngressClassResource IngressNginxControllerIngressClassResource `json:"ingressClassResource"`
@@ -59,8 +80,15 @@ type IngressNginxController struct {
 	NodeSelector map[string]string              `json:"nodeSelector"`
 	Service      *IngressNginxControllerService `json:"service,omitempty"`
 	//+optional
-	Resources         core.ResourceRequirements     `json:"resources"`
-	AdmissionWebhooks IngressNginxAdmissionWebhooks `json:"admissionWebhooks"`
+	Resources         core.ResourceRequirements           `json:"resources"`
+	AdmissionWebhooks IngressNginxAdmissionWebhooks       `json:"admissionWebhooks"`
+	NetworkPolicy     IngressNginxControllerNetworkPolicy `json:"networkPolicy"`
+	//+optional
+	ExtraArgs map[string]string `json:"extraArgs"`
+}
+
+type IngressNginxControllerNetworkPolicy struct {
+	Enabled bool `json:"enabled"`
 }
 
 type IngressNginxControllerImage struct {
@@ -85,16 +113,58 @@ type IngressNginxControllerIngressClassResource struct {
 	Name            string `json:"name"`
 }
 
-type IngressNginxControllerService struct {
-	External IngressNginxControllerServiceExternal `json:"external"`
-}
-
 type IngressNginxControllerServiceExternal struct {
 	Enabled bool `json:"enabled"`
 }
 
+type IngressNginxControllerService struct {
+	External                          IngressNginxControllerServiceExternal `json:"external"`
+	Labels                            map[string]string                     `json:"labels"`
+	EnableHttp                        bool                                  `json:"enableHttp"`
+	EnableHttps                       bool                                  `json:"enableHttps"`
+	IngressNginxControllerServiceSpec `json:",inline,omitempty"`
+	Internal                          IngressNginxControllerServiceSpec `json:"internal"`
+}
+
+type IngressNginxControllerServiceSpec struct {
+	Enabled                  bool                                     `json:"enabled"`
+	Annotations              map[string]string                        `json:"annotations"`
+	Type                     core.ServiceType                         `json:"type"`
+	ClusterIP                string                                   `json:"clusterIP"`
+	ExternalIPs              []string                                 `json:"externalIPs"`
+	LoadBalancerIP           string                                   `json:"loadBalancerIP"`
+	LoadBalancerSourceRanges []string                                 `json:"loadBalancerSourceRanges"`
+	LoadBalancerClass        string                                   `json:"loadBalancerClass"`
+	ExternalTrafficPolicy    string                                   `json:"externalTrafficPolicy"`
+	SessionAffinity          string                                   `json:"sessionAffinity"`
+	IpFamilyPolicy           string                                   `json:"ipFamilyPolicy"`
+	IpFamilies               []string                                 `json:"ipFamilies"`
+	Ports                    IngressNginxControllerServicePorts       `json:"ports"`
+	TargetPorts              IngressNginxControllerServiceTargetPorts `json:"targetPorts"`
+	AppProtocol              bool                                     `json:"appProtocol"`
+	NodePorts                IngressNginxControllerServiceNodePorts   `json:"nodePorts"`
+}
+
+type IngressNginxControllerServicePorts struct {
+	Http  int `json:"http"`
+	Https int `json:"https"`
+}
+
+type IngressNginxControllerServiceTargetPorts struct {
+	Http  string `json:"http"`
+	Https string `json:"https"`
+}
+
+type IngressNginxControllerServiceNodePorts struct {
+	Http  string            `json:"http"`
+	Https string            `json:"https"`
+	Tcp   map[string]string `json:"tcp"`
+	Udp   map[string]string `json:"udp"`
+}
+
 type IngressNginxAdmissionWebhooks struct {
-	Patch IngressNginxAdmissionWebhooksPatch `json:"patch"`
+	Enabled bool                               `json:"enabled"`
+	Patch   IngressNginxAdmissionWebhooksPatch `json:"patch"`
 }
 
 type IngressNginxAdmissionWebhooksPatch struct {

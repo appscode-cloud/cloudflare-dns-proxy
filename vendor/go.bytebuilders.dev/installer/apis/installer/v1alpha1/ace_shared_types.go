@@ -17,8 +17,14 @@ limitations under the License.
 package v1alpha1
 
 import (
+	configapi "go.bytebuilders.dev/resource-model/apis/config/v1alpha1"
+
 	"k8s.io/apimachinery/pkg/api/resource"
 )
+
+type DockerImage struct {
+	Image string `json:"image"`
+}
 
 type ImageReference struct {
 	Registry   string `json:"registry"`
@@ -105,4 +111,27 @@ type AceSettingsSecretName struct {
 
 type PersistenceSpec struct {
 	Size resource.Quantity `json:"size"`
+}
+
+type AceBrandingSpec struct {
+	//+optional
+	PrimaryColor string `json:"primaryColor"`
+	// +optional
+	Logo string `json:"logo"`
+	//+optional
+	Favicon string `json:"favicon"`
+}
+
+type AceSetupJob struct {
+	Annotations             map[string]string              `json:"annotations"`
+	Hook                    AceHook                        `json:"hook"`
+	TTLSecondsAfterFinished int                            `json:"ttlSecondsAfterFinished"`
+	Config                  configapi.AceSetupInlineConfig `json:"config"`
+}
+
+type AceHook struct {
+	Enable           bool   `json:"enable"`
+	Hook             string `json:"hook"`
+	HookWeight       string `json:"hookWeight"`
+	HookDeletePolicy string `json:"hookDeletePolicy"`
 }
