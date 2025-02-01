@@ -292,27 +292,27 @@ github.com/zeebo/xxh3
 ## explicit; go 1.22.0
 go.appscode.dev/alerts/apis/alerts
 go.appscode.dev/alerts/apis/alerts/v1alpha1
-# go.bytebuilders.dev/catalog v0.0.11
+# go.bytebuilders.dev/catalog v0.0.12
 ## explicit; go 1.22.7
 go.bytebuilders.dev/catalog/api/gateway/v1alpha1
-# go.bytebuilders.dev/installer v0.1.1-0.20250117110551-418dff4b6a67
+# go.bytebuilders.dev/installer v0.1.1-0.20250131114656-a096cf2a5e1a
 ## explicit; go 1.22.7
 go.bytebuilders.dev/installer/apis/installer
 go.bytebuilders.dev/installer/apis/installer/v1alpha1
-# go.bytebuilders.dev/lib-selfhost v0.0.10-0.20250121233839-ca6de3d3316a
+# go.bytebuilders.dev/lib-selfhost v0.0.10-0.20250131115105-3f5151d4a2fa
 ## explicit; go 1.22.7
 go.bytebuilders.dev/lib-selfhost/client
 # go.bytebuilders.dev/license-verifier v0.14.6
 ## explicit; go 1.21
 go.bytebuilders.dev/license-verifier/apis/licenses
 go.bytebuilders.dev/license-verifier/info
-# go.bytebuilders.dev/resource-model v0.1.1-0.20250113073009-6169434829cb
+# go.bytebuilders.dev/resource-model v0.2.0
 ## explicit; go 1.22.1
 go.bytebuilders.dev/resource-model/apis/cloud
 go.bytebuilders.dev/resource-model/apis/cloud/v1alpha1
 go.bytebuilders.dev/resource-model/apis/config/v1alpha1
 go.bytebuilders.dev/resource-model/crds
-# go.bytebuilders.dev/ui-wizards v0.12.0
+# go.bytebuilders.dev/ui-wizards v0.12.1
 ## explicit; go 1.22.0
 go.bytebuilders.dev/ui-wizards/apis/wizards
 go.bytebuilders.dev/ui-wizards/apis/wizards/v1alpha1

@@ -10,7 +10,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.19.1
 	github.com/spf13/cobra v1.8.1
-	go.bytebuilders.dev/lib-selfhost v0.0.10-0.20250121233839-ca6de3d3316a
+	go.bytebuilders.dev/lib-selfhost v0.0.10-0.20250131115105-3f5151d4a2fa
 	go.bytebuilders.dev/license-verifier v0.14.6
 	go.uber.org/automaxprocs v1.5.2
 	gomodules.xyz/logs v0.0.7
@@ -86,10 +86,10 @@ require (
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	go.appscode.dev/alerts v0.2.1-0.20240918094400-626962340a86 // indirect
-	go.bytebuilders.dev/catalog v0.0.11 // indirect
-	go.bytebuilders.dev/installer v0.1.1-0.20250117110551-418dff4b6a67 // indirect
-	go.bytebuilders.dev/resource-model v0.1.1-0.20250113073009-6169434829cb // indirect
-	go.bytebuilders.dev/ui-wizards v0.12.0 // indirect
+	go.bytebuilders.dev/catalog v0.0.12 // indirect
+	go.bytebuilders.dev/installer v0.1.1-0.20250131114656-a096cf2a5e1a // indirect
+	go.bytebuilders.dev/resource-model v0.2.0 // indirect
+	go.bytebuilders.dev/ui-wizards v0.12.1 // indirect
 	go.openviz.dev/installer v0.0.0-20241219171958-448ed4701f5b // indirect
 	golang.org/x/crypto v0.32.0 // indirect
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8 // indirect
