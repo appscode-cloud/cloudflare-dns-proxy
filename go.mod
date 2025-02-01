@@ -7,7 +7,6 @@ toolchain go1.23.5
 require (
 	github.com/cloudflare/cloudflare-go v0.92.0
 	github.com/go-chi/chi/v5 v5.0.12
-	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.19.1
 	github.com/spf13/cobra v1.8.1
 	go.bytebuilders.dev/lib-selfhost v0.0.10-0.20250131115105-3f5151d4a2fa
@@ -72,6 +71,7 @@ require (
 	github.com/onsi/gomega v1.33.1 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.0 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.75.2 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.55.0 // indirect

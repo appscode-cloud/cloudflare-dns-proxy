@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -37,7 +38,6 @@ import (
 	"github.com/cloudflare/cloudflare-go"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
@@ -77,6 +77,8 @@ func NewCmdRun(ctx context.Context) *cobra.Command {
 		metricsAddr      = ":8080"
 		apiServerAddress = ""
 		debug            = false
+		tlsCrt           string
+		tlsKey           string
 	)
 	cmd := &cobra.Command{
 		Use:               "run",
@@ -86,18 +88,20 @@ func NewCmdRun(ctx context.Context) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			klog.Infof("Starting binary version %s+%s ...", v.Version.Version, v.Version.CommitHash)
 
-			return run(ctx, addr, metricsAddr, apiServerAddress, debug)
+			return run(ctx, addr, metricsAddr, apiServerAddress, tlsCrt, tlsKey, debug)
 		},
 	}
 	cmd.Flags().StringVar(&addr, "listen", addr, "Listen address.")
 	cmd.Flags().StringVar(&metricsAddr, "metrics-addr", metricsAddr, "The address the metric endpoint binds to.")
 	cmd.Flags().StringVar(&apiServerAddress, "api-server-addr", apiServerAddress, "The API server address")
 	cmd.Flags().BoolVar(&debug, "debug", debug, "If true, dumps proxied request and responses")
+	cmd.Flags().StringVar(&tlsCrt, "tls-cert", tlsCrt, "Path to tls cert")
+	cmd.Flags().StringVar(&tlsKey, "tls-key", tlsKey, "Path to tls key")
 
 	return cmd
 }
 
-func run(ctx context.Context, addr, metricsAddr, apiServerAddress string, debug bool) error {
+func run(ctx context.Context, addr, metricsAddr, apiServerAddress, tlsCrt, tlsKey string, debug bool) error {
 	c, err := cloudflare.NewWithAPIToken(os.Getenv("CLOUDFLARE_API_TOKEN"))
 	if err != nil {
 		return err
@@ -139,9 +143,17 @@ func run(ctx context.Context, addr, metricsAddr, apiServerAddress string, debug 
 		Handler: router,
 	}
 	go func() {
-		log.Printf("API server listening at http://%s", addr)
-		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
-			klog.ErrorS(err, "HTTP server ListenAndServe failed")
+		if tlsCrt != "" && tlsKey != "" {
+			klog.Infof("Starting HTTPS server on %s", addr)
+			err := srv.ListenAndServeTLS(tlsCrt, tlsKey)
+			if err != nil {
+				klog.ErrorS(err, "HTTP server ListenAndServe failed")
+			}
+		} else {
+			log.Printf("Starting HTTP server on %s", addr)
+			if err := srv.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+				klog.ErrorS(err, "HTTP server ListenAndServe failed")
+			}
 		}
 	}()
 
@@ -228,7 +240,7 @@ func (rt cloudflareTransport) check(req *http.Request) (*client.InstallerMetadat
 	if req.Method != http.MethodGet &&
 		req.Method != http.MethodPost &&
 		req.Method != http.MethodDelete {
-		return nil, errors.Errorf("unsupported HTTP Method %s", req.Method)
+		return nil, fmt.Errorf("unsupported HTTP Method %s", req.Method)
 	}
 
 	meta, err := client.GetInstallerMetadata(rt.authEndpoint, req.Header.Get("Authorization"))
@@ -270,7 +282,7 @@ func (rt cloudflareTransport) check(req *http.Request) (*client.InstallerMetadat
 			ok := record.Name == meta.HostedDomain || strings.HasSuffix(record.Name, "."+meta.HostedDomain)
 			if !ok {
 				fmt.Printf("authorized to modify record for domain %s but modifying %s\n", meta.HostedDomain, record.Name)
-				return nil, errors.Errorf("authorized to modify record for domain %s but modifying %s", meta.HostedDomain, record.Name)
+				return nil, fmt.Errorf("authorized to modify record for domain %s but modifying %s", meta.HostedDomain, record.Name)
 			}
 		}
 	}
