@@ -14,7 +14,7 @@
 
 FROM {ARG_FROM}
 
-LABEL org.opencontainers.image.source https://github.com/bytebuilders/cloudflare-dns-proxy
+LABEL org.opencontainers.image.source https://github.com/appscode-cloud/cloudflare-dns-proxy
 
 ADD bin/{ARG_BIN}-{ARG_OS}-{ARG_ARCH} /{ARG_BIN}
 
