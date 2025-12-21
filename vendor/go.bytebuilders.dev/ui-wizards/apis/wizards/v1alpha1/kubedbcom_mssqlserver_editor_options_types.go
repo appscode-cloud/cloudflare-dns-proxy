@@ -46,7 +46,7 @@ type KubedbcomMssqlserverEditorOptionsSpecSpec struct {
 	Annotations map[string]string `json:"annotations"`
 	// +optional
 	Labels         map[string]string   `json:"labels"`
-	Mode           MssqlserverMode     `json:"mode"`
+	Mode           DoubleMode          `json:"mode"`
 	Replicas       int                 `json:"replicas"`
 	AcceptEULA     bool                `json:"acceptEULA"`
 	PID            MSSQLServerPID      `json:"pid"`
@@ -66,14 +66,11 @@ type KubedbcomMssqlserverEditorOptionsSpecSpec struct {
 	Openshift Openshift `json:"openshift"`
 }
 
-// +kubebuilder:validation:Enum=Standalone;Topology
-type MssqlserverMode string
-
 type MSSQLServerTopology struct {
 	AvailabilityGroup *MSSQLServerAGSpec `json:"availabilityGroup"`
 }
 
-// +kubebuilder:validation:Enum=Developer;Express;Standard;Enterprise;EnterpriseCore;Custom
+// +kubebuilder:validation:Enum=Developer;Express;Standard;Evaluation;Enterprise;EnterpriseCore;Custom
 type MSSQLServerPID string
 
 type MSSQLServerAGSpec struct {

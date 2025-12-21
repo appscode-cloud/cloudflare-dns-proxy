@@ -45,27 +45,42 @@ type KubedbcomFerretdbEditorOptionsSpecSpec struct {
 	// +optional
 	Annotations map[string]string `json:"annotations"`
 	// +optional
-	Labels         map[string]string  `json:"labels"`
-	Mode           GeneralMode        `json:"mode"`
-	Replicas       int                `json:"replicas"`
-	Backend        FerretDBBackend    `json:"backend"`
-	Persistence    Persistence        `json:"persistence"`
-	PodResources   PodResources       `json:"podResources"`
-	AuthSecret     AuthSecret         `json:"authSecret"`
-	DeletionPolicy DeletionPolicy     `json:"deletionPolicy"`
-	Configuration  string             `json:"configuration"`
-	Admin          AdminOptions       `json:"admin"`
-	Backup         BackupToolSpec     `json:"backup"`
-	Monitoring     MonitoringOperator `json:"monitoring"`
+	Labels         map[string]string `json:"labels"`
+	Mode           FerretDBMode      `json:"mode"`
+	Server         FerretDBServer    `json:"server"`
+	Backend        FerretDBBackend   `json:"backend"`
+	AuthSecret     AuthSecret        `json:"authSecret"`
+	DeletionPolicy DeletionPolicy    `json:"deletionPolicy"`
+	Configuration  string            `json:"configuration"`
+	// +optional
+	HostName string `json:"hostName"`
+	// +optional
+	IP         string             `json:"ip"`
+	Admin      AdminOptions       `json:"admin"`
+	Backup     BackupToolSpec     `json:"backup"`
+	Monitoring MonitoringOperator `json:"monitoring"`
 	// +optional
 	Openshift Openshift `json:"openshift"`
 }
 
-type FerretDBBackend struct {
-	ObjectReference   `json:",inline"`
-	ExternallyManaged bool `json:"externallyManaged"`
+// +kubebuilder:validation:Enum=PrimaryOnly;PrimaryAndSecondary
+type FerretDBMode string
+
+type FerretDBServer struct {
+	Primary   FerretNode `json:"primary"`
+	Secondary FerretNode `json:"secondary"`
 }
 
+type FerretNode struct {
+	Replicas     int          `json:"replicas"`
+	PodResources PodResources `json:"podResources"`
+}
+
+type FerretDBBackend struct {
+	Replicas     int          `json:"replicas"`
+	PodResources PodResources `json:"podResources"`
+	Persistence  Persistence  `json:"persistence"`
+}
 type FerretdbAlertsSpecForm struct {
 	Alert alerts.PostgresAlert `json:"alert"`
 }

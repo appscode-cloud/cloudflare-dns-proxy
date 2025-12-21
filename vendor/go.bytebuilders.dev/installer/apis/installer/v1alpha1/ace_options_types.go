@@ -54,24 +54,29 @@ type AceOptions struct {
 
 // AceOptionsSpec is the schema for AceOptions Operator values file
 type AceOptionsSpec struct {
-	Context      AceDeploymentContext            `json:"context"`
-	Release      ObjectReference                 `json:"release"`
-	Registry     RegistrySpec                    `json:"registry"`
-	Monitoring   GlobalMonitoring                `json:"monitoring"`
-	Infra        AceOptionsPlatformInfra         `json:"infra"`
-	Settings     AceOptionsSettings              `json:"settings"`
-	PlatformUi   AceOptionsComponentSpec         `json:"platform-ui"`
-	ClusterUi    AceOptionsComponentSpec         `json:"cluster-ui"`
-	Grafana      AceOptionsComponentSpec         `json:"grafana"`
-	KubedbUi     AceOptionsComponentSpec         `json:"kubedb-ui"`
-	PlatformApi  AceOptionsComponentSpec         `json:"platform-api"`
-	Ingress      AceOptionsIngressNginx          `json:"ingress"`
-	Nats         AceOptionsNatsSettings          `json:"nats"`
-	Trickster    AceOptionsComponentSpec         `json:"trickster"`
-	Openfga      AceOptionsComponentSpec         `json:"openfga"`
-	S3proxy      AceOptionsComponentSpec         `json:"s3proxy"`
-	Branding     AceBrandingSpec                 `json:"branding"`
-	InitialSetup configapi.AceSetupInlineOptions `json:"initialSetup"`
+	Context              AceDeploymentContext            `json:"context"`
+	Release              ObjectReference                 `json:"release"`
+	Registry             RegistrySpec                    `json:"registry"`
+	Monitoring           GlobalMonitoring                `json:"monitoring"`
+	Infra                AceOptionsPlatformInfra         `json:"infra"`
+	Settings             AceOptionsSettings              `json:"settings"`
+	PlatformUi           AceOptionsComponentSpec         `json:"platform-ui"`
+	ClusterUi            AceOptionsComponentSpec         `json:"cluster-ui"`
+	Grafana              AceOptionsComponentSpec         `json:"grafana"`
+	KubedbUi             AceOptionsComponentSpec         `json:"kubedb-ui"`
+	PlatformApi          AceOptionsComponentSpec         `json:"platform-api"`
+	Ingress              AceOptionsIngressNginx          `json:"ingress"`
+	Nats                 AceOptionsNatsSettings          `json:"nats"`
+	Trickster            AceOptionsComponentSpec         `json:"trickster"`
+	Openfga              AceOptionsComponentSpec         `json:"openfga"`
+	PgOutbox             AceOptionsComponentSpec         `json:"pgoutbox"`
+	OutboxSyncer         AceOptionsComponentSpec         `json:"outbox-syncer"`
+	S3proxy              AceOptionsComponentSpec         `json:"s3proxy"`
+	Branding             AceBrandingSpec                 `json:"branding"`
+	CloudProviderOptions CloudProviderOptions            `json:"cloudProviderOptions"`
+	InitialSetup         configapi.AceSetupInlineOptions `json:"initialSetup"`
+	// +optional
+	Distro shared.DistroSpec `json:"distro"`
 }
 
 func (a *AceOptionsSpec) IsOptionsComplete() bool {
@@ -157,11 +162,12 @@ type AceOptionsComponentSpec struct {
 	NodeSelector map[string]string `json:"nodeSelector"`
 }
 
-// +kubebuilder:validation:Enum=LoadBalancer;ClusterIP;HostPort
+// +kubebuilder:validation:Enum=LoadBalancer;NodePort;ClusterIP;HostPort
 type ServiceType string
 
 const (
 	ServiceTypeLoadBalancer ServiceType = "LoadBalancer"
+	ServiceTypeNodePort     ServiceType = "NodePort"
 	ServiceTypeHostPort     ServiceType = "HostPort"
 	ServiceTypeClusterIP    ServiceType = "ClusterIP"
 )
@@ -180,7 +186,8 @@ const (
 )
 
 type AceOptionsIngressNginx struct {
-	ExposeVia ServiceType `json:"exposeVia"`
+	Annotations map[string]string `json:"annotations,omitempty"`
+	ExposeVia   ServiceType       `json:"exposeVia"`
 	// DNS record types that will be considered for management
 	ManagedRecordTypes []DNSRecordType `json:"managedRecordTypes,omitempty"`
 	//+optional
@@ -202,9 +209,8 @@ type AceOptionsNatsSettings struct {
 	ExposeVia ExposeNatsVia `json:"exposeVia"`
 	Replics   int           `json:"replicas"`
 	//+optional
-	Resources core.ResourceRequirements `json:"resources"`
-	//+optional
-	NodeSelector map[string]string `json:"nodeSelector"`
+	Resources    core.ResourceRequirements `json:"resources"`
+	NodeSelector map[string]string         `json:"nodeSelector"`
 }
 
 type AceOptionsPlatformInfra struct {
@@ -274,8 +280,9 @@ export AZURE_STORAGE_KEY=%s`, cs.Objstore.Auth.Azure.AzureAccountName, cs.Objsto
 }
 
 type AceOptionsInfraObjstore struct {
-	Bucket string `json:"bucket"`
-	Prefix string `json:"prefix,omitempty"`
+	EnableCredLess bool   `json:"enableCredLess"`
+	Bucket         string `json:"bucket"`
+	Prefix         string `json:"prefix,omitempty"`
 	// Required for s3 type buckets other than AWS s3 buckets
 	Endpoint string `json:"endpoint,omitempty"`
 	// Required for s3 buckets
@@ -333,6 +340,9 @@ type AceOptionsAzureMarketplace struct {
 	TenantID     string `json:"tenantID"`
 	ClientID     string `json:"clientID"`
 	ClientSecret string `json:"clientSecret"`
+	// +optional
+	// +kubebuilder:validation:Format=date-time
+	ClientSecretExpiresAt string `json:"clientSecretExpiresAt"`
 }
 
 type AceOptionsAwsMarketplace struct {
@@ -366,18 +376,16 @@ type AceOptionsSMTPSettings struct {
 	SendAsPlainText bool `json:"sendAsPlainText"`
 }
 
-// +kubebuilder:validation:Enum=Hosted;SelfHostedProduction;OpenShiftProduction;CloudDemo;OnpremDemo;KubeAppDemo;OpenShiftDemo;AWSMarketplace;AzureMarketplace;GoogleCloudMarketplace
+// +kubebuilder:validation:Enum=Hosted;SelfHostedProduction;CloudDemo;OnpremDemo;KubeAppDemo;AWSMarketplace;AzureMarketplace;GoogleCloudMarketplace
 type DeploymentType string
 
 const (
 	HostedDeployment               DeploymentType = "Hosted"
 	SelfHostedProductionDeployment DeploymentType = "SelfHostedProduction"
-	OpenShiftProductionDeployment  DeploymentType = "OpenShiftProduction"
 
-	CloudDemoDeployment     DeploymentType = "CloudDemo"
-	OnpremDemoDeployment    DeploymentType = "OnpremDemo"
-	KubeAppDemoDeployment   DeploymentType = "KubeAppDemo"
-	OpenShiftDemoDeployment DeploymentType = "OpenShiftDemo"
+	CloudDemoDeployment   DeploymentType = "CloudDemo"
+	OnpremDemoDeployment  DeploymentType = "OnpremDemo"
+	KubeAppDemoDeployment DeploymentType = "KubeAppDemo"
 
 	AWSMarketplaceDeployment   DeploymentType = "AWSMarketplace"
 	AzureMarketplaceDeployment DeploymentType = "AzureMarketplace"
@@ -391,17 +399,11 @@ func (dt DeploymentType) Hosted() bool {
 func (dt DeploymentType) Demo() bool {
 	return dt == CloudDemoDeployment ||
 		dt == OnpremDemoDeployment ||
-		dt == KubeAppDemoDeployment ||
-		dt == OpenShiftDemoDeployment
+		dt == KubeAppDemoDeployment
 }
 
 func (dt DeploymentType) Onprem() bool {
 	return dt == OnpremDemoDeployment
-}
-
-func (dt DeploymentType) OpenShift() bool {
-	return dt == OpenShiftProductionDeployment ||
-		dt == OpenShiftDemoDeployment
 }
 
 func (dt DeploymentType) MarketplaceDeployment() bool {
@@ -448,7 +450,8 @@ type AceDeploymentContext struct {
 	PromotedToProduction bool             `json:"promotedToProduction,omitempty"`
 	PromotionValues      *PromotionValues `json:"promotionValues,omitempty"`
 
-	NatsOperatorSeed string `json:"natsOperatorSeed,omitempty"`
+	NatsOperatorSeed string   `json:"natsOperatorSeed,omitempty"`
+	SyncableEntities []string `json:"syncableEntities,omitempty"`
 	GeneratedValues  `json:",inline,omitempty"`
 }
 
@@ -479,8 +482,9 @@ type GeneratedValues struct {
 	// +optional
 	JKSPassword string `json:"jksPassword"`
 	// +optional
-	GrafanaSecretKey string            `json:"grafanaSecretKey"`
-	InboxServer      InboxServerValues `json:"inboxServer"`
+	GrafanaSecretKey string              `json:"grafanaSecretKey"`
+	InboxServer      InboxServerValues   `json:"inboxServer"`
+	OpenFGAServer    OpenFGAServerValues `json:"openfga"`
 	// InstallerSecret used by hosted mode (prod and ninja)
 	// to generate and validate marketplace self-hosted installer options
 	// +optional
@@ -491,8 +495,21 @@ type InboxServerValues struct {
 	AdminJWTPrivateKey string `json:"adminJWTPrivateKey"`
 }
 
+type OpenFGAServerValues struct {
+	PreSharedKeys []string `json:"preSharedKeys"`
+}
+
 type PromotionValues struct {
 	S3proxy AceOptionsInfraObjstore `json:"s3proxy,omitempty"`
+}
+
+type CloudProviderOptions struct {
+	AWS *ProviderAWSOptions `json:"aws,omitempty"`
+}
+
+type ProviderAWSOptions struct {
+	EipAllocationIDs []string `json:"eipAllocationIDs,omitempty"`
+	SubnetIDs        []string `json:"subnetIDs,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

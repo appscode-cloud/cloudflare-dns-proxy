@@ -45,7 +45,7 @@ type InitDatabase struct {
 }
 
 type Archiver struct {
-	RecoveryTimestamp  metav1.Time     `json:"recoveryTimestamp"`
+	RecoveryTimestamp  *metav1.Time    `json:"recoveryTimestamp"`
 	EncryptionSecret   ObjectReference `json:"encryptionSecret"`
 	FullDBRepository   ObjectReference `json:"fullDBRepository"`
 	ManifestRepository ObjectReference `json:"manifestRepository"`
@@ -54,12 +54,19 @@ type Archiver struct {
 // +kubebuilder:validation:Enum=Standalone;Replicaset
 type GeneralMode string
 
+// +kubebuilder:validation:Enum=Standalone;Topology
+type DoubleMode string
+
 type AuthSecret struct {
 	// +optional
 	Name string `json:"name"`
 	// +optional
 	// +kubebuilder:validation:Format:=password
 	Password string `json:"password"`
+}
+
+type RemoteReplica struct {
+	SourceRef ObjectReference `json:"sourceRef"`
 }
 
 type Openshift struct {

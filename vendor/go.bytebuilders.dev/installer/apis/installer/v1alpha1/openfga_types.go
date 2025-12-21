@@ -70,9 +70,11 @@ type OpenfgaSpec struct {
 	ImagePullSecrets                          []core.LocalObjectReference `json:"imagePullSecrets"`
 	NameOverride                              string                      `json:"nameOverride"`
 	FullnameOverride                          string                      `json:"fullnameOverride"`
+	CommonLabels                              map[string]string           `json:"commonLabels"`
 	ServiceAccount                            OpenfgaServiceAccountSpec   `json:"serviceAccount"`
 	Annotations                               map[string]string           `json:"annotations"`
 	PodAnnotations                            map[string]string           `json:"podAnnotations"`
+	PodExtraLabels                            map[string]string           `json:"podExtraLabels"`
 	ExtraEnvVars                              []core.EnvVar               `json:"extraEnvVars"`
 	ExtraVolumes                              []core.Volume               `json:"extraVolumes"`
 	ExtraVolumeMounts                         []core.VolumeMount          `json:"extraVolumeMounts"`
@@ -173,17 +175,23 @@ type OpenfgaTrace struct {
 }
 
 type OpenfgaDatastore struct {
-	Engine            string            `json:"engine"`
-	Uri               *string           `json:"uri"`
-	UriSecret         *string           `json:"uriSecret"`
-	MaxCacheSize      *string           `json:"maxCacheSize"`
-	MaxOpenConns      *string           `json:"maxOpenConns"`
-	MaxIdleConns      *string           `json:"maxIdleConns"`
-	ConnMaxIdleTime   *string           `json:"connMaxIdleTime"`
-	ConnMaxLifetime   *string           `json:"connMaxLifetime"`
-	ApplyMigrations   bool              `json:"applyMigrations"`
-	WaitForMigrations bool              `json:"waitForMigrations"`
-	Migrations        OpenfgaMigrations `json:"migrations"`
+	Engine            string                   `json:"engine"`
+	Uri               *string                  `json:"uri"`
+	UriSecret         *string                  `json:"uriSecret"`
+	MaxCacheSize      *string                  `json:"maxCacheSize"`
+	MaxOpenConns      *string                  `json:"maxOpenConns"`
+	MaxIdleConns      *string                  `json:"maxIdleConns"`
+	ConnMaxIdleTime   *string                  `json:"connMaxIdleTime"`
+	ConnMaxLifetime   *string                  `json:"connMaxLifetime"`
+	ApplyMigrations   bool                     `json:"applyMigrations"`
+	WaitForMigrations bool                     `json:"waitForMigrations"`
+	MigrationType     string                   `json:"migrationType"`
+	Metrics           *OpenfgaDatastoreMetrics `json:"metrics,omitempty"`
+	Migrations        OpenfgaMigrations        `json:"migrations"`
+}
+
+type OpenfgaDatastoreMetrics struct {
+	Enabled bool `json:"enabled"`
 }
 
 type OpenfgaMigrations struct {

@@ -89,8 +89,9 @@ type ObjectReference struct {
 }
 
 type ProviderMount struct {
-	Provider  string `json:"provider"`
-	MountPath string `json:"mountPath"`
+	Provider       string `json:"provider"`
+	MountPath      string `json:"mountPath"`
+	EnableCredLess bool   `json:"enableCredLess,omitempty"`
 }
 
 type VolumeMount struct {
@@ -103,10 +104,12 @@ type AceSettings struct {
 }
 
 type AceSettingsSecretName struct {
-	PlatformConfig string `json:"platformConfig"`
-	GrafanaConfig  string `json:"grafanaConfig"`
-	Objstore       string `json:"objstore"`
-	Nats           string `json:"nats"`
+	PlatformConfig       string `json:"platformConfig"`
+	PlatformSystemConfig string `json:"platformSystemConfig"`
+	PlatformUserConfig   string `json:"platformUserConfig"`
+	GrafanaConfig        string `json:"grafanaConfig"`
+	Objstore             string `json:"objstore"`
+	Nats                 string `json:"nats"`
 }
 
 type PersistenceSpec struct {

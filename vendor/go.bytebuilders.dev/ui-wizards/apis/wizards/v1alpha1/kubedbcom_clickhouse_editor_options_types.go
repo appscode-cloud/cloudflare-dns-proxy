@@ -17,7 +17,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	alerts "go.appscode.dev/alerts/apis/alerts/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	api "x-helm.dev/apimachinery/apis/releases/v1alpha1"
 )
@@ -38,7 +37,6 @@ type KubedbcomClickhouseEditorOptions struct {
 type KubedbcomClickhouseEditorOptionsSpec struct {
 	api.Metadata `json:"metadata,omitempty"`
 	Spec         KubedbcomClickhouseEditorOptionsSpecSpec `json:"spec"`
-	Form         ClickhouseAlertsSpecForm                 `json:"form"`
 }
 
 type KubedbcomClickhouseEditorOptionsSpecSpec struct {
@@ -46,7 +44,7 @@ type KubedbcomClickhouseEditorOptionsSpecSpec struct {
 	Annotations map[string]string `json:"annotations"`
 	// +optional
 	Labels         map[string]string  `json:"labels"`
-	Mode           ClickHouseMode     `json:"mode"`
+	Mode           DoubleMode         `json:"mode"`
 	Topology       ClickHouseTopology `json:"topology"`
 	Persistence    Persistence        `json:"persistence"`
 	PodResources   PodResources       `json:"podResources"`
@@ -60,27 +58,31 @@ type KubedbcomClickhouseEditorOptionsSpecSpec struct {
 	Openshift Openshift `json:"openshift"`
 }
 
-// +kubebuilder:validation:Enum=Standalone;Topology
-type ClickHouseMode string
-
 type ClickHouseTopology struct {
-	Cluster          []ClickHouseClusterSpec `json:"cluster"`
+	Cluster          ClickHouseClusterSpec   `json:"cluster"`
 	ClickHouseKeeper *ClickHouseKeeperConfig `json:"clickHouseKeeper"`
 }
 
 type ClickHouseClusterSpec struct {
-	Name     string `json:"name"`
-	Replicas int32  `json:"replicas"`
-	Shards   int32  `json:"shards"`
+	Replicas int32 `json:"replicas"`
+	Shards   int32 `json:"shards"`
 }
 
 type ClickHouseKeeperConfig struct {
+	ExternallyManaged bool                  `json:"externallyManaged"`
+	Node              *ClickHouseKeeperNode `json:"node"`
+	Spec              *ClickHouseKeeperSpec `json:"spec"`
+}
+
+type ClickHouseKeeperNode struct {
 	Host string `json:"host"`
 	Port int32  `json:"port"`
 }
 
-type ClickhouseAlertsSpecForm struct {
-	Alert alerts.MongoDBAlert `json:"alert"`
+type ClickHouseKeeperSpec struct {
+	Replicas     int32        `json:"replicas"`
+	Persistence  Persistence  `json:"persistence"`
+	PodResources PodResources `json:"podResources"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

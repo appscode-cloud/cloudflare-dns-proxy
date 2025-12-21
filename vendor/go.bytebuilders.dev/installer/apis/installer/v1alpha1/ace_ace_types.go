@@ -24,7 +24,9 @@ import (
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"kmodules.xyz/resource-metadata/apis/shared"
 	dnsapi "kubeops.dev/external-dns-operator/apis/external/v1alpha1"
+	kubeops_installer "kubeops.dev/installer/apis/installer/v1alpha1"
 )
 
 const (
@@ -62,6 +64,8 @@ type AceSpec struct {
 	Trickster    AceTrickster    `json:"trickster"`
 	Openfga      AceOpenfga      `json:"openfga"`
 	S3proxy      AceS3proxy      `json:"s3proxy"`
+	PgOutbox     AcePgOutbox     `json:"pgoutbox"`
+	OutboxSyncer AceOutboxSyncer `json:"outbox-syncer"`
 	// KubeBindServer AceKubeBindServer `json:"kube-bind-server"`
 	Global             AceGlobalValues           `json:"global"`
 	Settings           Settings                  `json:"settings"`
@@ -72,12 +76,13 @@ type AceSpec struct {
 	SecurityContext    *core.SecurityContext     `json:"securityContext"`
 	Resources          core.ResourceRequirements `json:"resources"`
 	//+optional
-	NodeSelector map[string]string                `json:"nodeSelector"`
-	Tolerations  []core.Toleration                `json:"tolerations"`
-	Affinity     *core.Affinity                   `json:"affinity"`
-	Branding     AceBrandingSpec                  `json:"branding"`
-	SetupJob     AceSetupJob                      `json:"setupJob"`
-	ExtraObjects map[string]*runtime.RawExtension `json:"extraObjects"`
+	NodeSelector         map[string]string                `json:"nodeSelector"`
+	Tolerations          []core.Toleration                `json:"tolerations"`
+	Affinity             *core.Affinity                   `json:"affinity"`
+	Branding             AceBrandingSpec                  `json:"branding"`
+	CloudProviderOptions CloudProviderOptions             `json:"cloudProviderOptions"`
+	SetupJob             AceSetupJob                      `json:"setupJob"`
+	ExtraObjects         map[string]*runtime.RawExtension `json:"extraObjects"`
 	// List of sources to populate environment variables in the container.
 	// The keys defined within a source must be a C_IDENTIFIER. All invalid keys
 	// will be reported as an event when the container is starting. When a key exists in multiple
@@ -179,6 +184,8 @@ type AceGlobalValues struct {
 	ServiceAccount   NatsServiceAccountSpec `json:"serviceAccount"`
 	Monitoring       GlobalMonitoring       `json:"monitoring"`
 	Infra            PlatformInfra          `json:"infra"`
+	// +optional
+	Distro shared.DistroSpec `json:"distro"`
 }
 
 type AcePlatformSettings struct {
@@ -249,15 +256,16 @@ const (
 )
 
 type InfraObjstore struct {
-	Provider  ObjstoreProvider      `json:"provider"`
-	Bucket    string                `json:"bucket"`
-	Prefix    string                `json:"prefix,omitempty"`
-	Endpoint  string                `json:"endpoint,omitempty"`
-	Region    string                `json:"region,omitempty"`
-	MountPath string                `json:"mountPath"`
-	S3        *wizardsapi.S3Auth    `json:"s3,omitempty"`
-	Azure     *wizardsapi.AzureAuth `json:"azure,omitempty"`
-	GCS       *wizardsapi.GCSAuth   `json:"gcs,omitempty"`
+	EnableCredLess bool                  `json:"enableCredLess,omitempty"`
+	Provider       ObjstoreProvider      `json:"provider"`
+	Bucket         string                `json:"bucket"`
+	Prefix         string                `json:"prefix,omitempty"`
+	Endpoint       string                `json:"endpoint,omitempty"`
+	Region         string                `json:"region,omitempty"`
+	MountPath      string                `json:"mountPath"`
+	S3             *wizardsapi.S3Auth    `json:"s3,omitempty"`
+	Azure          *wizardsapi.AzureAuth `json:"azure,omitempty"`
+	GCS            *wizardsapi.GCSAuth   `json:"gcs,omitempty"`
 }
 
 type InfraKms struct {
@@ -292,6 +300,7 @@ type Settings struct {
 	Cache       CacheSettings       `json:"cache"`
 	Smtp        SmtpSettings        `json:"smtp"`
 	Nats        NatsSettings        `json:"nats"`
+	OpenFGA     OpenFGASettings     `json:"openfga"`
 	Platform    PlatformSettings    `json:"platform"`
 	Security    SecuritySettings    `json:"security"`
 	Grafana     GrafanaSettings     `json:"grafana"`
@@ -408,7 +417,13 @@ type GrafanaSettings struct {
 type InboxServerSettings struct {
 	JmapURL            string `json:"jmapURL"`
 	WebAdminURL        string `json:"webAdminURL"`
+	EmailDomain        string `json:"emailDomain"`
 	AdminJWTPrivateKey string `json:"adminJWTPrivateKey"`
+}
+
+type OpenFGASettings struct {
+	ApiURL       string `json:"apiURL"`
+	PreSharedKey string `json:"preSharedKey"`
 }
 
 type ContractStorage struct {
@@ -432,6 +447,16 @@ type MarketplaceSettings struct {
 	Aws   *AceOptionsAwsMarketplace   `json:"aws,omitempty"`
 	Azure *AceOptionsAzureMarketplace `json:"azure,omitempty"`
 	Gcp   *AceOptionsGcpMarketplace   `json:"gcp,omitempty"`
+}
+
+type AcePgOutbox struct {
+	Enabled                         bool `json:"enabled"`
+	*kubeops_installer.PgoutboxSpec `json:",inline,omitempty"`
+}
+
+type AceOutboxSyncer struct {
+	Enabled           bool `json:"enabled"`
+	*OutboxSyncerSpec `json:",inline,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
